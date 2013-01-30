@@ -1,0 +1,4 @@
+quantscale
+==========
+
+Quant Scala Library
