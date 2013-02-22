@@ -19,6 +19,8 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze-process" % "0.2-SNAPSHOT",
   "org.scalanlp" %% "breeze-viz" % "0.2-SNAPSHOT",
   "org.scalaj" % "scalaj-time_2.9.2" % "0.6",
+  "net.objectlab.kit" % "datecalc-common" % "1.2.0",
+  "net.objectlab.kit" % "datecalc-joda" % "1.2.0",
   "org.scalatest" %% "scalatest" % "1.9.1" % "test",
   "junit" % "junit" % "4.11" % "test"
 )
