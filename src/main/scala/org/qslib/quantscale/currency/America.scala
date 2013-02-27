@@ -1,6 +1,6 @@
 package org.qslib.quantscale.currency
 
-import org.qslib.quantscale.math.Rounding
+import org.qslib.quantscale.math._
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -25,8 +25,7 @@ import org.qslib.quantscale.math.Rounding
  */
 
 /*
- Copyright (C) 2004 Decillion Pty(Ltd)
- Copyright (C) 2004, 2005, 2006, 2007 StatPro Italia srl
+ Copyright (C) 2004, 2005, 2008 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -43,39 +42,50 @@ import org.qslib.quantscale.math.Rounding
 */
 
 /**
- * Currency specification.
+ * ==American Currencies==
  *
- * @param name currency name, e.g, "U.S. Dollar"
- * @param code ISO 4217 three-letter code, e.g, "USD"
- * @param numericCode ISO 4217 numeric code, e.g, "840"
- * @param symbol symbol, e.g, "$"
- * @param fractionSymbol fraction symbol, e.g, "\u00a2"
- * @param fractionsPerUnit number of fractionary parts in a unit, e.g, 100
- * @param rounding rounding convention
- * @param format output format, it will be fed three positional parameters, namely, value, code, and symbol, in this order
- * @param triangulationCurrency currency used for triangulated exchange when required (optional)
+ * Object containing all American currencies.
+ * Data from http://fx.sauder.ubc.ca/currency_table.html
+ * and http://www.thefinancials.com/vortex/CurrencyFormats.html
  *
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Currency(
-  name: String,
-  code: String,
-  numericCode: Int,
-  symbol: String,
-  fractionSymbol: String,
-  fractionsPerUnit: Int,
-  rounding: Rounding,
-  format: String,
-  // TODO check how is this field used
-  triangulationCurrency: Option[Currency] = None) {
+object America {
 
-  /** @return code */
-  override def toString() = code
+  /**
+   * ==Argentinian Peso==
+   * The ISO three-letter code is ARS; the numeric code is 32.
+   * It is divided in 100 centavos.
+   */
+  val ARS = Currency("Argentinian peso", "ARS", 32, "", "", 100, Rounding(), "%2% %1$.2f")
 
-  /** Compares currency names */
-  override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].name == name
+  /**
+   * ==Brazilian Real==
+   * The ISO three-letter code is BRL; the numeric code is 986.
+   * It is divided in 100 centavos.
+   */
+  val BRL = Currency("Brazilian real", "BRL", 986, "R$", "", 100, Rounding(), "%3% %1$.2f")
 
-  /** @return name's hash code */
-  override def hashCode() = name.hashCode()
+  /**
+   * ==Canadian Dollar==
+   * The ISO three-letter code is CAD; the numeric code is 124.
+   * It is divided into 100 cents.
+   */
+  val CAD = Currency("Canadian dollar", "CAD", 124, "Can$", "", 100, Rounding(), "%3% %1$.2f")
+
+  /**
+   * ==Mexican Peso==
+   * The ISO three-letter code is MXN; the numeric code is 484.
+   * It is divided in 100 centavos.
+   */
+  val MXN = Currency("Mexican peso", "MXN", 484, "Mex$", "", 100, Rounding(), "%3% %1$.2f")
+
+  /**
+   * ==U.S. Dollar==
+   * The ISO three-letter code is USD; the numeric code is 840.
+   * It is divided in 100 cents.
+   */
+  val USD = Currency("U.S. dollar", "USD", 840, "$", "\u00a2", 100, Rounding(), "%3% %1$.2f")
+
 }

@@ -1,6 +1,6 @@
 package org.qslib.quantscale.currency
 
-import org.qslib.quantscale.math.Rounding
+import org.qslib.quantscale.math._
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -25,8 +25,7 @@ import org.qslib.quantscale.math.Rounding
  */
 
 /*
- Copyright (C) 2004 Decillion Pty(Ltd)
- Copyright (C) 2004, 2005, 2006, 2007 StatPro Italia srl
+ Copyright (C) 2004, 2005, 2006 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -43,39 +42,36 @@ import org.qslib.quantscale.math.Rounding
 */
 
 /**
- * Currency specification.
+ * ==European Currencies==
  *
- * @param name currency name, e.g, "U.S. Dollar"
- * @param code ISO 4217 three-letter code, e.g, "USD"
- * @param numericCode ISO 4217 numeric code, e.g, "840"
- * @param symbol symbol, e.g, "$"
- * @param fractionSymbol fraction symbol, e.g, "\u00a2"
- * @param fractionsPerUnit number of fractionary parts in a unit, e.g, 100
- * @param rounding rounding convention
- * @param format output format, it will be fed three positional parameters, namely, value, code, and symbol, in this order
- * @param triangulationCurrency currency used for triangulated exchange when required (optional)
+ * Object containing all European currencies.
+ * Data from http://fx.sauder.ubc.ca/currency_table.html
+ * and http://www.thefinancials.com/vortex/CurrencyFormats.html
  *
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Currency(
-  name: String,
-  code: String,
-  numericCode: Int,
-  symbol: String,
-  fractionSymbol: String,
-  fractionsPerUnit: Int,
-  rounding: Rounding,
-  format: String,
-  // TODO check how is this field used
-  triangulationCurrency: Option[Currency] = None) {
+object Europe {
 
-  /** @return code */
-  override def toString() = code
+  /**
+   * ==Swiss Franc==
+   * The ISO three-letter code is CHF; the numeric code is 756.
+   * It is divided into 100 cents.
+   */
+  val CHF = Currency("Swiss franc", "CHF", 756, "SwF", "", 100, Rounding(), "%3% %1$.2f")
 
-  /** Compares currency names */
-  override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].name == name
+  /**
+   * ==European Euro==
+   * The ISO three-letter code is EUR; the numeric code is 978.
+   * It is divided into 100 cents.
+   */
+  val EUR = Currency("European Euro", "EUR", 978, "\u20ac", "", 100, Rounding(), "%2% %1$.2f")
 
-  /** @return name's hash code */
-  override def hashCode() = name.hashCode()
+  /**
+   * ==British Pound Sterling==
+   * The ISO three-letter code is GBP; the numeric code is 826.
+   * It is divided into 100 pence.
+   */
+  val GBP = Currency("British pound sterling", "GBP", 826, "\u00a3", "p", 100, Rounding(), "%3% %1$.2f")
+
 }

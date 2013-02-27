@@ -45,7 +45,7 @@ import org.qslib.quantscale.Decimal
 */
 
 /**
- * == Rounding Methods ==
+ * ==Rounding Methods==
  * The rounding methods follow the OMG specification available at ftp://ftp.omg.org/pub/docs/formal/00-06-29.pdf
  *
  * WARNING: The names of the Floor and Ceiling methods might be misleading. Check the provided reference.
@@ -89,7 +89,7 @@ case object Ceiling extends RoundingType
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Rounding(precision: Int, roundingType: RoundingType = Closest, digit: Int = 5) {
+case class Rounding(precision: Int = 2, roundingType: RoundingType = Closest, digit: Int = 5) {
 
   def apply(value: Decimal): Decimal = {
     if (roundingType == None) value

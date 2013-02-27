@@ -1,6 +1,6 @@
 package org.qslib.quantscale.currency
 
-import org.qslib.quantscale.math.Rounding
+import org.qslib.quantscale.math._
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -25,8 +25,7 @@ import org.qslib.quantscale.math.Rounding
  */
 
 /*
- Copyright (C) 2004 Decillion Pty(Ltd)
- Copyright (C) 2004, 2005, 2006, 2007 StatPro Italia srl
+ Copyright (C) 2004, 2005 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -43,39 +42,29 @@ import org.qslib.quantscale.math.Rounding
 */
 
 /**
- * Currency specification.
+ * ==Oceanian Currencies==
  *
- * @param name currency name, e.g, "U.S. Dollar"
- * @param code ISO 4217 three-letter code, e.g, "USD"
- * @param numericCode ISO 4217 numeric code, e.g, "840"
- * @param symbol symbol, e.g, "$"
- * @param fractionSymbol fraction symbol, e.g, "\u00a2"
- * @param fractionsPerUnit number of fractionary parts in a unit, e.g, 100
- * @param rounding rounding convention
- * @param format output format, it will be fed three positional parameters, namely, value, code, and symbol, in this order
- * @param triangulationCurrency currency used for triangulated exchange when required (optional)
+ * Object containing all Oceanian currencies.
+ * Data from http://fx.sauder.ubc.ca/currency_table.html
+ * and http://www.thefinancials.com/vortex/CurrencyFormats.html
  *
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Currency(
-  name: String,
-  code: String,
-  numericCode: Int,
-  symbol: String,
-  fractionSymbol: String,
-  fractionsPerUnit: Int,
-  rounding: Rounding,
-  format: String,
-  // TODO check how is this field used
-  triangulationCurrency: Option[Currency] = None) {
+object Oceania {
 
-  /** @return code */
-  override def toString() = code
+  /**
+   * ==Australian Dollar==
+   * The ISO three-letter code is AUD; the numeric code is 36.
+   * It is divided into 100 cents.
+   */
+  val AUD = Currency("Australian dollar", "AUD", 36, "A$", "", 100, Rounding(), "%3% %1$.2f")
 
-  /** Compares currency names */
-  override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].name == name
+  /**
+   * ==New Zealand Dollar==
+   * The ISO three-letter code is NZD; the numeric code is 554.
+   * It is divided in 100 cents.
+   */
+  val NZD = Currency("New Zealand dollar", "NZD", 554, "NZ$", "", 100, Rounding(), "%3% %1$.2f")
 
-  /** @return name's hash code */
-  override def hashCode() = name.hashCode()
 }
