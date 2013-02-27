@@ -1,4 +1,4 @@
-package org.qslib.quantscale.currency
+package org.qslib.quantscale
 
 import org.qslib.quantscale.math.Rounding
 

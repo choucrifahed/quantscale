@@ -1,6 +1,7 @@
 package org.qslib.quantscale.currency
 
 import org.qslib.quantscale.math._
+import org.qslib.quantscale.Currency
 
 /*
  Copyright (C) 2013 Choucri FAHED

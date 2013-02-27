@@ -74,4 +74,12 @@ package object quantscale {
 
   /** Volatility. */
   type Volatility = Double
+
+  /** Information about a default-protection contract */
+  // comes from default.hpp
+  object Side extends Enumeration {
+    type Side = Value
+
+    val Buyer, Seller = Value
+  }
 }
