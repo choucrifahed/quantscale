@@ -1,0 +1,79 @@
+package org.qslib.quantscale.currency
+
+import org.qslib.quantscale.math.Rounding
+
+/*
+ Copyright (C) 2013 Choucri FAHED
+
+ This source code is release under the BSD License.
+
+ This file is part of QuantScale, a free-software/open-source library
+ for financial quantitative analysts and developers - 
+ http://github.com/choucrifahed/quantscale
+
+ QuantScale is free software: you can redistribute it and/or modify it
+ under the terms of the QuantScale license.  You should have received a
+ copy of the license along with this program; if not, please email
+ <choucri.fahed@mines-nancy.org>.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the license for more details.
+
+ QuantScale is based on QuantLib. http://quantlib.org/
+ When applicable, the original copyright notice follows this notice.
+ */
+
+/*
+ Copyright (C) 2004 Decillion Pty(Ltd)
+ Copyright (C) 2004, 2005, 2006, 2007 StatPro Italia srl
+
+ This file is part of QuantLib, a free-software/open-source library
+ for financial quantitative analysts and developers - http://quantlib.org/
+
+ QuantLib is free software: you can redistribute it and/or modify it
+ under the terms of the QuantLib license.  You should have received a
+ copy of the license along with this program; if not, please email
+ <quantlib-dev@lists.sf.net>. The license is also available online at
+ <http://quantlib.org/license.shtml>.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the license for more details.
+*/
+
+/**
+ * Currency specification.
+ *
+ * @param name currency name, e.g, "U.S. Dollar"
+ * @param code ISO 4217 three-letter code, e.g, "USD"
+ * @param numericCode ISO 4217 numeric code, e.g, "840"
+ * @param symbol symbol, e.g, "$"
+ * @param fractionSymbol fraction symbol, e.g, "\u023c"
+ * @param fractionsPerUnit number of fractionary parts in a unit, e.g, 100
+ * @param rounding rounding convention
+ * @param triangulationCurrency currency used for triangulated exchange when required (optional)
+ *
+ * @author Choucri FAHED
+ * @since 1.0
+ */
+// FIXME if any field is optional enclose it in Option
+case class Currency(
+  name: String,
+  code: String,
+  numericCode: Int,
+  symbol: String,
+  fractionSymbol: String,
+  fractionsPerUnit: Int,
+  rounding: Rounding,
+  triangulationCurrency: Option[Currency]) {
+
+  /** @return code */
+  override def toString() = code
+
+  /** Compares currency names */
+  override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].name == name
+
+  /** @return name's hash code */
+  override def hashCode() = name.hashCode()
+}
