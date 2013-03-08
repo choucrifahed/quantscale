@@ -53,22 +53,11 @@ import scala.concurrent.Future
  * @author Choucri FAHED
  * @since 1.0
  */
-trait PricingEngine[A] {
+trait PricingEngine[A] extends Observable {
 
-  self: Observable with Observer =>
+  protected def validate(argument: A): Try[A]
 
-  def validate(argument: A): Try[A]
-
-  def getArguments(): Seq[A]
-
-  // TODO Should it be kept?!
-  def getResults(): Try[Results]
-
-  // TODO Should it be kept?!
-  def reset()
-
-  // TODO Can it be a Promise?
-  def calculate(): Future[Results]
+  def calculate(arguments: A*): Future[Results]
 
   def update() {
     notifyObservers()
@@ -76,7 +65,7 @@ trait PricingEngine[A] {
 }
 
 // TODO consider moving to Money
-case class Results(value: Real, errorEstimate: Option[Real], valuationDate: DateTime, additionalResults: Map[String, Any]) {
+case class Results(value: Real = 0, errorEstimate: Option[Real] = Some(0), valuationDate: DateTime = new DateTime, additionalResults: Map[String, Any] = Map()) {
 
   /**
    * @returns any additional result returned by the pricing engine.

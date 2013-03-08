@@ -1,6 +1,9 @@
 package org.qslib.quantscale.pattern
 
 import scala.util.Try
+import org.qslib.quantscale.Results
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -48,13 +51,12 @@ import scala.util.Try
  * @since 1.0
  */
 // FIXME Find a more functional way of solving this problem
-trait LazyObject {
-  
-  self: Observable with Observer =>
+trait LazyObject extends Observable with Observer {
 
   // FIXME not thread-safe!
-  var calculated: Boolean = false
-  var frozen: Boolean = false
+  protected var calculated: Boolean = false
+  protected var frozen: Boolean = false
+  protected var cachedResults: Future[Results] = future { Results() }
 
   /**
    * This method forces the recalculation of any results which would otherwise be cached.
@@ -62,7 +64,7 @@ trait LazyObject {
    * itself as observer with the structures on which such results depend.
    * It is strongly advised to follow this policy when possible.
    */
-  def recalculate() = {
+  def recalculate(): Future[Results] = {
     val wasFrozen = frozen
     calculated = false
     frozen = false
@@ -108,24 +110,25 @@ trait LazyObject {
    * WARNING: Should this method be redefined in derived classes, LazyObject.calculate()
    * should be called in the overriding method.
    */
-  def calculate() = {
+  protected def calculate(): Future[Results] = {
     if (!calculated && !frozen) {
-      calculated = true; // prevent infinite recursion in case of bootstrapping
+      calculated = true // prevent infinite recursion in case of bootstrapping
       try {
-        performCalculations()
+        cachedResults = performCalculations()
       } catch {
         case e: Exception =>
           calculated = false
           throw e
       }
     }
+    cachedResults
   }
 
   /**
-   * This method must implement any calculations which must be (re)done in order to calculate
-   * the desired results.
+   * This method must implement any calculations which must be
+   * (re)done in order to calculate the desired results.
    */
-  def performCalculations()
+  protected def performCalculations(): Future[Results]
 
   def update() {
     // forwards notifications only the first time

@@ -1,6 +1,11 @@
 package org.qslib.quantscale
 
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Failure
+import scala.util.Success
 import org.qslib.quantscale.pattern.LazyObject
+import org.joda.time.DateTime
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -50,18 +55,29 @@ import org.qslib.quantscale.pattern.LazyObject
  * @author Choucri FAHED
  * @since 1.0
  */
-trait Instrument[A] {
+trait Instrument[A] extends LazyObject {
 
-  self: LazyObject =>
-
-  var pricingEngine: PricingEngine[A] // Might want to use multiple ones, why not make it an implicit parameter
+  //  private var _engine: Option[PricingEngine[A]] = None // Might want to use multiple ones, why not make it an implicit parameter
+  //
+  //  def pricingEngine = _engine
+  //
+  //  def pricingEngine_=(pe: PricingEngine[A]) {
+  //    if (None != _engine) unregisterWith(_engine.get)
+  //    _engine = Some(pe)
+  //    registerWith(_engine.get)
+  //    // trigger (lazy) recalculation and notify observers
+  //    update()
+  //  }
 
   // FIXME This class is not thread-safe!!!
-  
+
   /**
    * @return the net present value of the instrument.
    */
-  var NPF: Real
+  def NPF = calculate() map (_.value)
+  def errorEstimate = calculate() map (_.errorEstimate)
+  def valuationDate = calculate() map (_.valuationDate)
+  def additionalResults = calculate() map (_.additionalResults)
 
   /**
    * @returns whether the instrument might have value greater than zero.
@@ -69,27 +85,30 @@ trait Instrument[A] {
   def isExpired(): Boolean
 
   /**
-   * When a derived argument structure is defined for an
-   * instrument, this method should be overridden to fill
-   * it. This is mandatory in case a pricing engine is used.
-   */
-  def setupArguments(args: A*)
-
-  /**
-   * When a derived result structure is defined for an 
+   * When a derived result structure is defined for an
    * instrument, this method should be overridden to read from
    * it. This is mandatory in case a pricing engine is used.
    */
   def fetchResults(): Results
-  
-  protected def calculate()
-  
+
+  override protected def calculate() = {
+    if (isExpired()) {
+      setupExpired()
+      calculated = true
+      cachedResults
+    } else {
+      super.calculate
+    }
+  }
+
   /**
    * This method must leave the instrument in a consistent
    * state when the expiration condition is met.
    */
-  protected def setupExpired()
-  
+  protected def setupExpired() {
+    cachedResults = future { Results() }
+  }
+
   /**
    * In case a pricing engine is '''not''' used, this
    * method must be overridden to perform the actual
@@ -97,7 +116,7 @@ trait Instrument[A] {
    * a pricing engine is used, the default implementation
    * can be used.
    */
-  protected def performCalculations()
+  protected def performCalculations()(implicit engine: PricingEngine[A]) = engine.calculate()
 }
 
 
