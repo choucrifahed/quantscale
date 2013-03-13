@@ -68,7 +68,7 @@ trait PricingEngine[A] extends Observable {
 case class Results(value: Real = 0, errorEstimate: Option[Real] = Some(0), valuationDate: DateTime = new DateTime, additionalResults: Map[String, Any] = Map()) {
 
   /**
-   * @returns any additional result returned by the pricing engine.
+   * @return any additional result returned by the pricing engine.
    */
   def result(tag: String): Option[Any] = try {
     Some(additionalResults(tag))

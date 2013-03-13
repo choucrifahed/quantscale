@@ -1,5 +1,7 @@
 package org.qslib
 
+import org.joda.time.LocalDate
+
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -82,4 +84,7 @@ package object quantscale {
 
     val Buyer, Seller = Value
   }
+
+  val MinDate = new LocalDate(Long.MinValue)
+  val MaxDate = new LocalDate(Long.MaxValue)
 }

@@ -80,7 +80,7 @@ trait Instrument[A] extends LazyObject {
   def additionalResults = calculate() map (_.additionalResults)
 
   /**
-   * @returns whether the instrument might have value greater than zero.
+   * @return whether the instrument might have value greater than zero.
    */
   def isExpired(): Boolean
 

@@ -67,7 +67,6 @@ case class Currency(
   fractionsPerUnit: Int,
   rounding: Rounding,
   format: String,
-  // TODO check how is this field used
   triangulationCurrency: Option[Currency] = None) {
 
   /** @return code */
@@ -78,4 +77,7 @@ case class Currency(
 
   /** @return name's hash code */
   override def hashCode() = name.hashCode()
+
+  /** Shortcut to declare money amounts such as 50.0 *: EUR instead of Money(50.0, EUR) */
+  def *:(amount: Decimal) = Money(amount, this)
 }
