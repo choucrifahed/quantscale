@@ -87,4 +87,23 @@ package object quantscale {
 
   val MinDate = new LocalDate(Long.MinValue)
   val MaxDate = new LocalDate(Long.MaxValue)
+
+  // Most frequently used currencies
+  val CHF = org.qslib.quantscale.currency.Europe.CHF
+  val EUR = org.qslib.quantscale.currency.Europe.EUR
+  val GBP = org.qslib.quantscale.currency.Europe.GBP
+  val JPY = org.qslib.quantscale.currency.Asia.JPY
+  val USD = org.qslib.quantscale.currency.America.USD
+
+  // Syntactic sugar
+  /** Shortcut to declare money amounts such as 50.0 * EUR instead of Money(50.0, EUR) */
+  implicit class DecimalToMoney(val value: Double) extends AnyVal {
+    def *(currency: Currency) = Money(value, currency)
+    def *(money: Money) = Money(value * money.value, money.currency)
+    def /(money: Money) = Money(value / money.value, money.currency)
+  }
+
+  // Implicit values
+  // TODO Move this a proper config file
+  implicit val moneyConversionConfig = MoneyConversionConfig(AutomatedConversion, USD)
 }

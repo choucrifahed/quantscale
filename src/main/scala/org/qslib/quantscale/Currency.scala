@@ -72,12 +72,12 @@ case class Currency(
   /** @return code */
   override def toString() = code
 
-  /** Compares currency names */
-  override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].name == name
+  /** Compares currency codes */
+  override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].code == code
 
-  /** @return name's hash code */
-  override def hashCode() = name.hashCode()
+  /** @return code's hash code */
+  override def hashCode() = code.hashCode()
 
-  /** Shortcut to declare money amounts such as 50.0 *: EUR instead of Money(50.0, EUR) */
-  def *:(amount: Decimal) = Money(amount, this)
+  /** Shortcut to declare money amounts such as EUR * 50.0 instead of Money(50.0, EUR) */
+  def *(amount: Decimal) = Money(amount, this)
 }

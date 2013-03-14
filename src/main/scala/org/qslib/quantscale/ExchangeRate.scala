@@ -69,7 +69,7 @@ case class ExchangeRate(source: Currency, target: Currency, rate: Decimal, erTyp
   def exchange(amount: Money): Try[Money] =
     if (amount.currency == source) Success(Money(amount.value * rate, target))
     else if (amount.currency == target) Success(Money(amount.value / rate, source))
-    else Failure(new Exception("Exchange rate " + this + " not applicable to currency " + amount.currency + "."))
+    else Failure(new IllegalArgumentException("Exchange rate " + this + " not applicable to currency " + amount.currency + "."))
 }
 
 object ExchangeRate {
@@ -80,6 +80,6 @@ object ExchangeRate {
     else if (r1.source == r2.target) Success(ExchangeRate(r1.target, r2.source, 1.0 / (r1.rate * r2.rate), Derived))
     else if (r1.target == r2.source) Success(ExchangeRate(r1.source, r2.target, r1.rate * r2.rate, Derived))
     else if (r1.target == r2.target) Success(ExchangeRate(r1.source, r2.source, r1.rate / r2.rate, Derived))
-    else Failure(new Exception("Exchange rates " + r1 + " and " + r2 + " are not chainable."))
+    else Failure(new IllegalArgumentException("Exchange rates " + r1 + " and " + r2 + " are not chainable."))
 }
 

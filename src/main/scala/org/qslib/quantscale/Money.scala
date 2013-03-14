@@ -1,5 +1,12 @@
 package org.qslib.quantscale
 
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
+
+import org.qslib.quantscale._
+import org.qslib.quantscale.currency._
+
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -48,34 +55,47 @@ package org.qslib.quantscale
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Money(value: Decimal = 0.0, currency: Currency) extends Ordered[Money] {
+case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
+  extends Ordered[Money] {
 
   override def toString = currency.format.format(rounded(), currency.code, currency.symbol)
 
+  def convertTo(targetCur: Currency): Try[Money] = {
+    if (currency != targetCur) {
+      for {
+        rate <- ExchangeRateManager.lookup(currency, targetCur)
+        result <- rate.exchange(this)
+      } yield result.rounded
+    } else Success(this)
+  }
+
+  def convertToBase(): Try[Money] = convertTo(mcc.baseCurrency)
+
   // Arithmetics and comparisons
   def unary_+ = this
-  def unary_- = Money(-value, currency)
+  def unary_- = Money(-value, currency)(mcc)
 
-  def +(that: Money) = ???
-  def -(that: Money) = ???
-  def *(that: Money) = ???
-  def *(that: Decimal) = ???
-  def /(that: Money) = ???
-  def /(that: Decimal) = ???
+  def +(that: Money) = process(that) { (a, b) => a + b }
+  def -(that: Money) = process(that) { (a, b) => a - b }
+  def *(that: Money) = process(that) { (a, b) => a * b }
+  def /(that: Money) = process(that) { (a, b) => a / b }
+  def *(that: Decimal) = Money(value * that, currency)(mcc)
+  def /(that: Decimal) = Money(value / that, currency)(mcc)
 
-  //    /*! \relates Money */
-  //    Money operator*(const Money&, Decimal);
-  //    /*! \relates Money */
-  //    Money operator*(Decimal, const Money&);
-  //    /*! \relates Money */
-  //    Money operator/(const Money&, Decimal);
-  //    /*! \relates Money */
-  //    Decimal operator/(const Money&, const Money&);
-  //
-  // FIXME override equals() and toString()
-  //bool operator==(const Money&, const Money&);
-  //    /*! \relates Money */
-  //    bool operator!=(const Money&, const Money&);
+  private def process(that: Money)(op: (Decimal, Decimal) => Decimal): Try[Money] = {
+    if (currency == that.currency) Success(Money(op(value, that.value), currency))
+    else mcc.conversionType match {
+      case BaseCurrencyConversion => for {
+        m1 <- this.convertToBase()
+        m2 <- that.convertToBase()
+      } yield Money(op(m1.value, m2.value), m1.currency)
+      case AutomatedConversion => for {
+        m2 <- that.convertTo(currency)
+      } yield Money(op(value, m2.value), currency)
+      case NoConversion => Failure(new IllegalArgumentException("Cannot convert amounts of different currencies with no conversion specified."))
+    }
+  }
+
   //
   //    /*! \relates Money */
   //    bool close(const Money&, const Money&, Size n = 42);
@@ -85,17 +105,57 @@ case class Money(value: Decimal = 0.0, currency: Currency) extends Ordered[Money
   def rounded(): Money = Money(currency rounding value, currency)
 
   /**
-   * Result of comparing `this` with operand `that`.
-   *
-   * Implement this method to determine how instances of Money will be sorted.
-   *
-   * Returns `x` where:
-   *   - `x < 0` when `this < that`
-   *   - `x == 0` when `this == that`
-   *   - `x > 0` when  `this > that`
+   * Unlike == (which relies on equals()) this method tries to check if two cash amounts are equal even if they have different currencies.
+   * Therefore, equals() method does not have the same behavior as in Quantlib because it has to comply with hashCode().
+   * Thus the default implementations of equals() and hashCode() are not overriden.
    */
-  // FIXME take conversion into account!
-  def compare(that: Money): Int = value compare that.value
+  def ===(that: Money) = compare(that) == 0
+  
+  /**
+   * Result of comparing `this` with Money `that`.
+   * First, tries to convert to the same currency,
+   * then compares value amounts.
+   *
+   * @return `x` where:
+   *   - `x < 0` when `this.value < that.value`
+   *   - `x == 0` when `this.value == that.value`
+   *   - `x > 0` when  `this.value > that.value`
+   * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
+   */
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  def compare(that: Money): Int = {
+    val comparison = handleConversion(that)((a, b) => a compare b)
+
+    // This is where an exception can be thrown
+    comparison.get
+  }
+
+  /**
+   * Determines if 2 amounts of cash are almost equal or not.
+   * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
+   */
+  import AlmostEqual._
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  def ~=(that: Money)(implicit p: Precision) = {
+    val comparison = handleConversion(that)((a, b) => a.~=(b)(p))
+
+    // This is where an exception can be thrown
+    comparison.get
+  }
+
+  private def handleConversion[R](that: Money)(op: (Decimal, Decimal) => R): Try[R] = {
+    if (currency == that.currency) Success(op(value, that.value))
+    else mcc.conversionType match {
+      case BaseCurrencyConversion => for {
+        m1 <- this.convertToBase()
+        m2 <- that.convertToBase()
+      } yield op(m1.value, m2.value)
+      case AutomatedConversion => for {
+        m2 <- that.convertTo(currency)
+      } yield op(value, m2.value)
+      case NoConversion => Failure(new IllegalArgumentException("Cannot convert amounts of different currencies with no conversion specified."))
+    }
+  }
 }
 
 /**
@@ -103,19 +163,15 @@ case class Money(value: Decimal = 0.0, currency: Currency) extends Ordered[Money
  *
  * These parameters are used for combining money amounts in different currencies.
  */
-object ConversionType extends Enumeration {
-  type ConversionType = Value
+sealed trait ConversionType
 
-  /** Do not perform conversions. */
-  val NoConversion = Value
+/** Do not perform conversions. */
+object NoConversion extends ConversionType
 
-  /** Convert both operands to the base currency before converting. */
-  val BaseCurrencyConversion = Value
+/** Convert both operands to the base currency before converting. */
+object BaseCurrencyConversion extends ConversionType
 
-  /** Return the result in the currency of the first operand. */
-  val AutomatedConversion = Value
-}
-import ConversionType._
+/** Return the result in the currency of the first operand. */
+object AutomatedConversion extends ConversionType
 
 case class MoneyConversionConfig(conversionType: ConversionType, baseCurrency: Currency)
-

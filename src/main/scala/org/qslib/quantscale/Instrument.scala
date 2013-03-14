@@ -2,7 +2,6 @@ package org.qslib.quantscale
 
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Failure
 import scala.util.Success
 import org.qslib.quantscale.pattern.LazyObject
 import org.joda.time.DateTime
