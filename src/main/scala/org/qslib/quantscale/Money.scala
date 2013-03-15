@@ -6,6 +6,7 @@ import scala.util.Failure
 
 import org.qslib.quantscale._
 import org.qslib.quantscale.currency._
+import org.qslib.quantscale.math._
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -58,7 +59,7 @@ import org.qslib.quantscale.currency._
 case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
   extends Ordered[Money] {
 
-  override def toString = currency.format.format(rounded(), currency.code, currency.symbol)
+  override def toString = currency.format.format(rounded().value, currency.code, currency.symbol)
 
   def convertTo(targetCur: Currency): Try[Money] = {
     if (currency != targetCur) {
@@ -72,15 +73,15 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
   def convertToBase(): Try[Money] = convertTo(mcc.baseCurrency)
 
   // Arithmetics and comparisons
-  def unary_+ = this
-  def unary_- = Money(-value, currency)(mcc)
+  @inline def unary_+ = this
+  @inline def unary_- = Money(-value, currency)(mcc)
 
-  def +(that: Money) = process(that) { (a, b) => a + b }
-  def -(that: Money) = process(that) { (a, b) => a - b }
-  def *(that: Money) = process(that) { (a, b) => a * b }
-  def /(that: Money) = process(that) { (a, b) => a / b }
-  def *(that: Decimal) = Money(value * that, currency)(mcc)
-  def /(that: Decimal) = Money(value / that, currency)(mcc)
+  @inline def +(that: Money) = process(that) { (a, b) => a + b }
+  @inline def -(that: Money) = process(that) { (a, b) => a - b }
+  @inline def *(that: Money) = process(that) { (a, b) => a * b }
+  @inline def /(that: Money) = process(that) { (a, b) => a / b }
+  @inline def *(that: Decimal) = Money(value * that, currency)(mcc)
+  @inline def /(that: Decimal) = Money(value / that, currency)(mcc)
 
   private def process(that: Money)(op: (Decimal, Decimal) => Decimal): Try[Money] = {
     if (currency == that.currency) Success(Money(op(value, that.value), currency))
@@ -96,21 +97,15 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
     }
   }
 
-  //
-  //    /*! \relates Money */
-  //    bool close(const Money&, const Money&, Size n = 42);
-  //    /*! \relates Money */
-  //    bool close_enough(const Money&, const Money&, Size n = 42);
-
-  def rounded(): Money = Money(currency rounding value, currency)
+  @inline def rounded(): Money = Money(currency rounding value, currency)
 
   /**
    * Unlike == (which relies on equals()) this method tries to check if two cash amounts are equal even if they have different currencies.
    * Therefore, equals() method does not have the same behavior as in Quantlib because it has to comply with hashCode().
    * Thus the default implementations of equals() and hashCode() are not overriden.
    */
-  def ===(that: Money) = compare(that) == 0
-  
+  @inline def ===(that: Money) = compare(that) == 0
+
   /**
    * Result of comparing `this` with Money `that`.
    * First, tries to convert to the same currency,
@@ -123,7 +118,7 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
    * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
    */
   @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
-  def compare(that: Money): Int = {
+  @inline def compare(that: Money): Int = {
     val comparison = handleConversion(that)((a, b) => a compare b)
 
     // This is where an exception can be thrown
@@ -136,7 +131,7 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
    */
   import AlmostEqual._
   @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
-  def ~=(that: Money)(implicit p: Precision) = {
+  @inline def ~=(that: Money)(implicit p: Precision) = {
     val comparison = handleConversion(that)((a, b) => a.~=(b)(p))
 
     // This is where an exception can be thrown

@@ -1,4 +1,6 @@
-package org.qslib.quantscale
+package org.qslib.quantscale.math
+
+import org.qslib.quantscale.Decimal
 
 /*
  Copyright (C) 2013 Choucri FAHED
@@ -22,16 +24,12 @@ package org.qslib.quantscale
  When applicable, the original copyright notice follows this notice.
  */
 
+// Plays a similar role to /math/comparison.hpp in QuantLib
+
 case class Precision(p: Double) extends AnyVal
 
-trait AlmostEqual[E] {
-  def ~=(that: E)(implicit p: Precision)
-}
-
 object AlmostEqual {
-  implicit val precision = Precision(0.00001)
-
-  implicit class AlmostEqualDecimal(val d: Decimal) extends AlmostEqual[Decimal] {
+  implicit class AlmostEqualDecimal(val d: Decimal) extends AnyVal {
     def ~=(d2: Decimal)(implicit p: Precision) = {
       val diff = (d - d2).abs
       (diff == 0.0) || (if (d == 0.0) diff / d2 <= p.p else diff / d <= p.p)

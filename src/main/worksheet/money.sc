@@ -1,0 +1,42 @@
+/*
+ Copyright (C) 2013 Choucri FAHED
+
+ This source code is release under the BSD License.
+
+ This file is part of QuantScale, a free-software/open-source library
+ for financial quantitative analysts and developers -
+ http://github.com/choucrifahed/quantscale
+
+ QuantScale is free software: you can redistribute it and/or modify it
+ under the terms of the QuantScale license.  You should have received a
+ copy of the license along with this program; if not, please email
+ <choucri.fahed@mines-nancy.org>.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the license for more details.
+
+ QuantScale is based on QuantLib. http://quantlib.org/
+ When applicable, the original copyright notice follows this notice.
+ */
+
+import org.qslib.quantscale._
+
+/**
+ * Examples of using Money classes.
+ */
+object money {
+  val eur_usd = ExchangeRate(EUR, USD, 1.2042)    //> eur_usd  : org.qslib.quantscale.ExchangeRate = ExchangeRate(EUR,USD,1.2042,D
+                                                  //| irect)
+
+  val m1 = 50000.0 * EUR                          //> m1  : org.qslib.quantscale.Money = % 50000,00
+  val m2 = 100000.0 * USD                         //> m2  : org.qslib.quantscale.Money = % 100000,00
+
+  val conversionType = NoConversion               //> conversionType  : org.qslib.quantscale.NoConversion.type = org.qslib.quants
+                                                  //| cale.NoConversion$@d1131dc
+
+  val calculated = eur_usd.exchange(m1).get       //> calculated  : org.qslib.quantscale.Money = % 60210,00
+  val expected = (m1.value * eur_usd.rate) * USD  //> expected  : org.qslib.quantscale.Money = % 60210,00
+
+  calculated.~=(expected)                         //> res0: Boolean = true
+}

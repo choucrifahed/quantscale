@@ -15,3 +15,4 @@ project/plugins/project/
 .project
 .scala_dependencies
 .settings/
+.worksheet/

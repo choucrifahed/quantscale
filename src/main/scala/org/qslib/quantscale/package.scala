@@ -85,8 +85,8 @@ package object quantscale {
     val Buyer, Seller = Value
   }
 
-  val MinDate = new LocalDate(Long.MinValue)
-  val MaxDate = new LocalDate(Long.MaxValue)
+  val MinDate = new LocalDate(0, 1, 1)
+  val MaxDate = new LocalDate(9999, 12, 31)
 
   // Most frequently used currencies
   val CHF = org.qslib.quantscale.currency.Europe.CHF
@@ -106,4 +106,5 @@ package object quantscale {
   // Implicit values
   // TODO Move this a proper config file
   implicit val moneyConversionConfig = MoneyConversionConfig(AutomatedConversion, USD)
+  implicit val precision = org.qslib.quantscale.math.Precision(0.00001)
 }
