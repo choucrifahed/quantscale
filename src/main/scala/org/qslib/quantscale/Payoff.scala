@@ -1,11 +1,5 @@
 package org.qslib.quantscale
 
-import org.qslib.quantscale.pattern.Observable
-import org.scala_tools.time.Imports._
-import org.qslib.quantscale.pattern.AcyclicVisitor
-import org.qslib.quantscale.pattern.Visitor
-import org.qslib.quantscale.pattern.ObservableDefImpl
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -28,8 +22,8 @@ import org.qslib.quantscale.pattern.ObservableDefImpl
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2009 Ferdinando Ametrano
- Copyright (C) 2005 Joseph Wang
+ Copyright (C) 2003, 2006 Ferdinando Ametrano
+ Copyright (C) 2006 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -46,25 +40,18 @@ import org.qslib.quantscale.pattern.ObservableDefImpl
 */
 
 /**
- * Base class for events associated with a given date.
- * This class acts as a base class for the actual event implementations.
+ * Abstract base class for option payoffs.
  *
  * @author Choucri FAHED
  * @since 1.0
  */
-trait Event extends Observable {
-
-  /** @return the date at which the event occurs */
-  def date(): LocalDate
-
+trait Payoff extends Function1[Money, Money] {
+  
   /**
-   * @param includeRefDate If includeRefDate is true, then an event has not occurred if its
-   * date is the same as the refDate, i.e. this method returns false if
-   * the event date is the same as the refDate.
-   * @return true if an event has already occurred before a date
+   * WARNING: This method is used for output and comparison between
+   * payoffs. It is '''not''' meant to be used for writing 
+   * switch-on-type code.
    */
-  def hasOccurred(refDate: LocalDate = LocalDate.now, includeRefDate: Boolean = false): Boolean =
-    if (includeRefDate) date < refDate else date <= refDate
+  def name(): String
+  def description(): String
 }
-
-class SimpleEvent(val date: LocalDate) extends Event with ObservableDefImpl
