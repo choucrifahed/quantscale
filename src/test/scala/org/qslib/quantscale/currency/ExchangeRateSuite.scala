@@ -28,7 +28,6 @@ import org.scala_tools.time.Imports._
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2004 StatPro Italia srl
 
