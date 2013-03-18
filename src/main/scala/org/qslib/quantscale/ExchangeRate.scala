@@ -70,16 +70,15 @@ case class ExchangeRate(source: Currency, target: Currency, rate: Decimal, erTyp
     if (amount.currency == source) Success(Money(amount.value * rate, target))
     else if (amount.currency == target) Success(Money(amount.value / rate, source))
     else Failure(new IllegalArgumentException("Exchange rate " + this + " not applicable to currency " + amount.currency + "."))
-}
-
-object ExchangeRate {
 
   /** Chains two exchange rates */
-  def chain(r1: ExchangeRate, r2: ExchangeRate): Try[ExchangeRate] =
-    if (r1.source == r2.source) Success(ExchangeRate(r1.target, r2.target, r2.rate / r1.rate, Derived))
-    else if (r1.source == r2.target) Success(ExchangeRate(r1.target, r2.source, 1.0 / (r1.rate * r2.rate), Derived))
-    else if (r1.target == r2.source) Success(ExchangeRate(r1.source, r2.target, r1.rate * r2.rate, Derived))
-    else if (r1.target == r2.target) Success(ExchangeRate(r1.source, r2.source, r1.rate / r2.rate, Derived))
-    else Failure(new IllegalArgumentException("Exchange rates " + r1 + " and " + r2 + " are not chainable."))
-}
+  def chain(that: ExchangeRate): Try[ExchangeRate] =
+    if (source == that.source) Success(ExchangeRate(target, that.target, that.rate / rate, Derived))
+    else if (source == that.target) Success(ExchangeRate(target, that.source, 1.0 / (rate * that.rate), Derived))
+    else if (target == that.source) Success(ExchangeRate(source, that.target, rate * that.rate, Derived))
+    else if (target == that.target) Success(ExchangeRate(source, that.source, rate / that.rate, Derived))
+    else Failure(new IllegalArgumentException("Exchange rates " + this + " and " + that + " are not chainable."))
 
+  /** Alternate syntax for chaining exchange rates, for operator notation fans! */
+  @inline def ::(that: ExchangeRate) = chain(that)
+}

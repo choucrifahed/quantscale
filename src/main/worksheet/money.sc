@@ -29,14 +29,15 @@ object money {
   val eur_usd = ExchangeRate(EUR, USD, 1.2042)    //> eur_usd  : org.qslib.quantscale.ExchangeRate = ExchangeRate(EUR,USD,1.2042,D
                                                   //| irect)
 
-  val m1 = 50000.0 * EUR                          //> m1  : org.qslib.quantscale.Money = % 50000,00
-  val m2 = 100000.0 * USD                         //> m2  : org.qslib.quantscale.Money = % 100000,00
+  val m1 = 50000.0 * EUR                          //> m1  : org.qslib.quantscale.Money = 50000.0 €
+  val m2 = 100000.0 * USD                         //> m2  : org.qslib.quantscale.Money = 100000.0 $
 
   val conversionType = NoConversion               //> conversionType  : org.qslib.quantscale.NoConversion.type = org.qslib.quants
-                                                  //| cale.NoConversion$@d1131dc
+                                                  //| cale.NoConversion$@6ebbd7d
 
-  val calculated = eur_usd.exchange(m1).get       //> calculated  : org.qslib.quantscale.Money = % 60210,00
-  val expected = (m1.value * eur_usd.rate) * USD  //> expected  : org.qslib.quantscale.Money = % 60210,00
+  val calculated = eur_usd.exchange(m1).get       //> calculated  : org.qslib.quantscale.Money = 60210.0 $
+  val expected = (m1.value * eur_usd.rate) * USD  //> expected  : org.qslib.quantscale.Money = 60210.0 $
 
-  calculated.~=(expected)                         //> res0: Boolean = true
+  calculated == expected                          //> res0: Boolean = true
+  calculated ~= expected                          //> res1: Boolean = true
 }

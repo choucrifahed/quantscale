@@ -59,7 +59,9 @@ import org.qslib.quantscale.math._
 case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
   extends Ordered[Money] {
 
-  override def toString = currency.format.format(rounded().value, currency.code, currency.symbol)
+  // FIXME currency formats are odd!
+  // override def toString = currency.format.format(rounded().value, currency.code, currency.symbol)
+  override def toString = rounded().value + " " + (if (currency.symbol != "") currency.symbol else currency.code)
 
   def convertTo(targetCur: Currency): Try[Money] = {
     if (currency != targetCur) {
@@ -82,6 +84,7 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
   @inline def /(that: Money) = process(that) { (a, b) => a / b }
   @inline def *(that: Decimal) = Money(value * that, currency)(mcc)
   @inline def /(that: Decimal) = Money(value / that, currency)(mcc)
+  @inline def *(that: ExchangeRate) = that exchange this
 
   private def process(that: Money)(op: (Decimal, Decimal) => Decimal): Try[Money] = {
     if (currency == that.currency) Success(Money(op(value, that.value), currency))

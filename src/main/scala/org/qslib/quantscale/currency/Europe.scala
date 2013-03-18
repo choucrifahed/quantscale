@@ -75,4 +75,18 @@ object Europe {
    */
   val GBP = Currency("British pound sterling", "GBP", 826, "\u00a3", "p", 100, Rounding(), "%3% %1$.2f")
 
+  /**
+   * ==Italian lira==
+   * The ISO three-letter code was ITL; the numeric code was 380.
+   * It had no subdivisions. Obsoleted by the Euro since 1999.
+   */
+  val ITL = Currency("Italian lira", "ITL", 380, "L", "", 0, Rounding(), "%3% %1$.2f", Some(EUR))
+
+  /**
+   * ==Swedish krona==
+   * The ISO three-letter code is SEK; the numeric code is 752.
+   * It is divided in 100 oere.
+   */
+  val SEK = Currency("Swedish krona", "SEK", 752, "kr", "", 100, Rounding(), "%1$.2f %3%")
+
 }

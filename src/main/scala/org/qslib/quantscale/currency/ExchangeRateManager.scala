@@ -62,7 +62,7 @@ trait ExchangeRateManager {
    * '''Note''': If two rates are given between the same currencies and with overlapping
    * date ranges, the latest one added takes precedence during lookup.
    */
-  def add(rate: ExchangeRate, startDate: LocalDate, endDate: LocalDate)
+  def add(rate: ExchangeRate, startDate: LocalDate = MinDate, endDate: LocalDate = MaxDate)
 
   /**
    * Looks up the exchange rate between two currencies at a given
@@ -104,7 +104,10 @@ object ExchangeRateManager extends ExchangeRateManager {
     }
   }
 
-  def clear() = repository.clear()
+  def clear() {
+    repository.clear()
+    addKnownRates()
+  }
 
   def lookup(source: Currency,
     target: Currency,
@@ -118,7 +121,7 @@ object ExchangeRateManager extends ExchangeRateManager {
       else for {
         rate1 <- directLookup(source, link, date)
         rate2 <- lookup(link, target, date)
-        chain <- ExchangeRate.chain(rate1, rate2)
+        chain <- rate1 chain rate2
       } yield chain
     } else if (!target.triangulationCurrency.isEmpty) {
       val link = target.triangulationCurrency.get
@@ -126,7 +129,7 @@ object ExchangeRateManager extends ExchangeRateManager {
       else for {
         rate1 <- lookup(source, link, date)
         rate2 <- directLookup(link, target, date)
-        chain <- ExchangeRate.chain(rate1, rate2)
+        chain <- rate1 chain rate2
       } yield chain
     } else smartLookup(source, target, date)
   }
@@ -154,7 +157,7 @@ object ExchangeRateManager extends ExchangeRateManager {
               val result = for {
                 head <- directLookup(source, other, date)
                 tail <- smartLookup(other, target, date, newForbidden)
-                chain <- ExchangeRate.chain(head, tail)
+                chain <- head chain tail
               } yield chain
 
               // This breaks the loop
@@ -170,13 +173,23 @@ object ExchangeRateManager extends ExchangeRateManager {
   }
 
   private def directLookup(source: Currency, target: Currency, date: LocalDate): Try[ExchangeRate] = {
-    val rates = repository.get(source.code + target.code).filter(_.validAt(date))
-    if (rates.isEmpty) Failure(new Exception("No direct conversion available from " + source + " to " + target + " on " + date))
-    else Success(rates.head.rate)
+    val rates = repository.get(key(source, target))
+    val filteredRates = if (rates != null) rates.filter(_.validAt(date)) else Seq()
+    if (filteredRates.isEmpty) Failure(new Exception("No direct conversion available from " + source + " to " + target + " on " + date))
+    else Success(filteredRates.head.rate)
+  }
+
+  private def key(source: Currency, target: Currency) = scala.collection.SortedSet(source.code, target.code).reduce(_ + _)
+
+  private def addKnownRates() {
+    // Currencies obsoleted by Euro
+    add(ExchangeRate(EUR, Europe.ITL, 1936.27), new LocalDate(1999, 1, 1))
   }
 
   private case class Entry(rate: ExchangeRate, startDate: LocalDate = MinDate, endDate: LocalDate = MaxDate) {
-    def key = rate.source.code + rate.target.code
+    def key = ExchangeRateManager.key(rate.source, rate.target)
     def validAt(date: LocalDate) = date >= startDate && date <= endDate
   }
+
+  addKnownRates()
 }
