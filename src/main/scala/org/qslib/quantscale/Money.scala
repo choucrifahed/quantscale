@@ -67,7 +67,7 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
     if (currency != targetCur) {
       for {
         rate <- ExchangeRateManager.lookup(currency, targetCur)
-        result <- rate.exchange(this)
+        result <- rate.exchange(this)(mcc)
       } yield result.rounded
     } else Success(this)
   }
@@ -78,29 +78,65 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
   @inline def unary_+ = this
   @inline def unary_- = Money(-value, currency)(mcc)
 
-  @inline def +(that: Money) = process(that) { (a, b) => a + b }
-  @inline def -(that: Money) = process(that) { (a, b) => a - b }
-  @inline def *(that: Money) = process(that) { (a, b) => a * b }
-  @inline def /(that: Money) = process(that) { (a, b) => a / b }
+  /**
+   * Adds two cash amounts and returns the result as Money.
+   * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
+   */
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  @inline def +(that: Money) = add(that).get
+
+  /**
+   * Subtracts two cash amounts and returns the result as Money.
+   * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
+   */
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  @inline def -(that: Money) = subtract(that).get
+
+  /**
+   * Multiplies two cash amounts and returns the result as Money.
+   * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
+   */
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  @inline def *(that: Money) = multiply(that).get
+
+  /**
+   * Divides two cash amounts and returns the result as Money.
+   * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
+   */
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  @inline def /(that: Money) = divide(that).get
+
   @inline def *(that: Decimal) = Money(value * that, currency)(mcc)
   @inline def /(that: Decimal) = Money(value / that, currency)(mcc)
-  @inline def *(that: ExchangeRate) = that exchange this
+  @inline def *(that: ExchangeRate) = that.exchange(this)(mcc)
+
+  /** Adds two cash amounts and returns the result as Try[Money]. */
+  @inline def add(that: Money) = process(that) { (a, b) => a + b }
+
+  /** Subtracts two cash amounts and returns the result as Try[Money]. */
+  @inline def subtract(that: Money) = process(that) { (a, b) => a - b }
+
+  /** Multiplies two cash amounts and returns the result as Try[Money]. */
+  @inline def multiply(that: Money) = process(that) { (a, b) => a * b }
+
+  /** Divides two cash amounts and returns the result as Try[Money]. */
+  @inline def divide(that: Money) = process(that) { (a, b) => a / b }
 
   private def process(that: Money)(op: (Decimal, Decimal) => Decimal): Try[Money] = {
-    if (currency == that.currency) Success(Money(op(value, that.value), currency))
+    if (currency == that.currency) Success(Money(op(value, that.value), currency)(mcc))
     else mcc.conversionType match {
       case BaseCurrencyConversion => for {
         m1 <- this.convertToBase()
         m2 <- that.convertToBase()
-      } yield Money(op(m1.value, m2.value), m1.currency)
+      } yield Money(op(m1.value, m2.value), m1.currency)(mcc)
       case AutomatedConversion => for {
         m2 <- that.convertTo(currency)
-      } yield Money(op(value, m2.value), currency)
+      } yield Money(op(value, m2.value), currency)(mcc)
       case NoConversion => Failure(new IllegalArgumentException("Cannot convert amounts of different currencies with no conversion specified."))
     }
   }
 
-  @inline def rounded(): Money = Money(currency rounding value, currency)
+  @inline def rounded(): Money = Money(currency rounding value, currency)(mcc)
 
   /**
    * Unlike == (which relies on equals()) this method tries to check if two cash amounts are equal even if they have different currencies.
@@ -173,3 +209,8 @@ object BaseCurrencyConversion extends ConversionType
 object AutomatedConversion extends ConversionType
 
 case class MoneyConversionConfig(conversionType: ConversionType, baseCurrency: Currency)
+
+object MoneyConversionDefaultConfig {
+  // TODO Move this a proper config file
+  implicit val moneyConversionConfig = MoneyConversionConfig(AutomatedConversion, EUR)
+}

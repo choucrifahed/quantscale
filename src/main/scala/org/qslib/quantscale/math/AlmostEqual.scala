@@ -28,6 +28,11 @@ import org.qslib.quantscale.Decimal
 
 case class Precision(p: Double) extends AnyVal
 
+object DefaultPrecision {
+  // TODO Move this a proper config file
+  implicit val precision = org.qslib.quantscale.math.Precision(0.00001)
+}
+
 object AlmostEqual {
   implicit class AlmostEqualDecimal(val d: Decimal) extends AnyVal {
     def ~=(d2: Decimal)(implicit p: Precision) = {

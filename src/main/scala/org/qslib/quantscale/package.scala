@@ -23,7 +23,6 @@ import org.joda.time.LocalDate
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
  Copyright (C) 2003, 2004, 2005 StatPro Italia srl
@@ -98,13 +97,8 @@ package object quantscale {
   // Syntactic sugar
   /** Shortcut to declare money amounts such as 50.0 * EUR instead of Money(50.0, EUR) */
   implicit class DecimalToMoney(val value: Double) extends AnyVal {
-    def *(currency: Currency) = Money(value, currency)
-    def *(money: Money) = Money(value * money.value, money.currency)
-    def /(money: Money) = Money(value / money.value, money.currency)
+    def *(currency: Currency)(implicit mcc: MoneyConversionConfig) = Money(value, currency)(mcc)
+    def *(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value * money.value, money.currency)(mcc)
+    def /(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value / money.value, money.currency)(mcc)
   }
-
-  // Implicit values
-  // TODO Move this a proper config file
-  implicit val moneyConversionConfig = MoneyConversionConfig(AutomatedConversion, USD)
-  implicit val precision = org.qslib.quantscale.math.Precision(0.00001)
 }

@@ -5,7 +5,9 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.qslib.quantscale._
 import math.AlmostEqual._
+import math.DefaultPrecision._
 import org.scala_tools.time.Imports._
+import MoneyConversionDefaultConfig._
 
 /*
  Copyright (C) 2013 Choucri FAHED

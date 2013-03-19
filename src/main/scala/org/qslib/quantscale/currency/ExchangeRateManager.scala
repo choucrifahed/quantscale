@@ -88,6 +88,7 @@ trait ExchangeRateManager {
 /**
  * Singleton implementation based on ConcurrentHashMap.
  */
+// FIXME singletons don't play well with concurrent test suite execution (SBT)
 object ExchangeRateManager extends ExchangeRateManager {
 
   // Beware this can be a memory leak if the map is never emptied.
@@ -167,7 +168,7 @@ object ExchangeRateManager extends ExchangeRateManager {
         }
 
         // if the loop completed, we have no way to return the requested rate.
-        Failure[ExchangeRate](new Exception("No conversion available from " + source + " to " + target + " on  " + date))
+        Failure[ExchangeRate](new Exception("No conversion available from " + source + " to " + target + " on " + date))
       }
     }
   }

@@ -66,9 +66,9 @@ case class ExchangeRate(source: Currency, target: Currency, rate: Decimal, erTyp
   require(rate != 0.0, "An exchange rate cannot be equal to zero!")
 
   /** Applies the exchange rate to a cash amount. */
-  def exchange(amount: Money): Try[Money] =
-    if (amount.currency == source) Success(Money(amount.value * rate, target))
-    else if (amount.currency == target) Success(Money(amount.value / rate, source))
+  def exchange(amount: Money)(implicit mcc: MoneyConversionConfig): Try[Money] =
+    if (amount.currency == source) Success(Money(amount.value * rate, target)(mcc))
+    else if (amount.currency == target) Success(Money(amount.value / rate, source)(mcc))
     else Failure(new IllegalArgumentException("Exchange rate " + this + " not applicable to currency " + amount.currency + "."))
 
   /** Chains two exchange rates */
