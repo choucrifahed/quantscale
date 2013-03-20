@@ -113,13 +113,7 @@ trait LazyObject extends Observable with Observer {
   protected def calculate(): Future[Results] = {
     if (!calculated && !frozen) {
       calculated = true // prevent infinite recursion in case of bootstrapping
-      try {
-        cachedResults = performCalculations()
-      } catch {
-        case e: Exception =>
-          calculated = false
-          throw e
-      }
+      cachedResults = performCalculations()
     }
     cachedResults
   }
