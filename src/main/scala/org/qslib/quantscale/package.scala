@@ -51,10 +51,6 @@ package object quantscale {
 
   // Brief Custom types
 
-  // FIXME Check if necessary
-  /** Size of a container. */
-  type Size = Int
-
   /** Real number. */
   type Real = Double
 

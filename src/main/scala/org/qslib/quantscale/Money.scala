@@ -200,13 +200,13 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
 sealed trait ConversionType
 
 /** Do not perform conversions. */
-object NoConversion extends ConversionType
+case object NoConversion extends ConversionType
 
 /** Convert both operands to the base currency before converting. */
-object BaseCurrencyConversion extends ConversionType
+case object BaseCurrencyConversion extends ConversionType
 
 /** Return the result in the currency of the first operand. */
-object AutomatedConversion extends ConversionType
+case object AutomatedConversion extends ConversionType
 
 case class MoneyConversionConfig(conversionType: ConversionType, baseCurrency: Currency)
 

@@ -41,16 +41,16 @@ package org.qslib.quantscale
 sealed trait Compounding
 
 /** 1+rt */
-object Simple extends Compounding
+case object Simple extends Compounding
 
 /** (1+r)^t */
-object Compounded extends Compounding
+case object Compounded extends Compounding
 
 /** e^(rt) */
-object Continuous extends Compounding
+case object Continuous extends Compounding
 
 /** Simple up to the first period then Compounded */
-object SimpleThenCompounded extends Compounding
+case object SimpleThenCompounded extends Compounding
 
 trait InterestRate {
 
