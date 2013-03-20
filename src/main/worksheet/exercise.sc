@@ -23,6 +23,7 @@
 import org.qslib.quantscale._
 import org.scala_tools.time.Imports._
 
+// TODO move to unit test!
 object exercise {
 
   val date1 = new LocalDate(2013, 1, 1)           //> date1  : org.joda.time.LocalDate = 2013-01-01
