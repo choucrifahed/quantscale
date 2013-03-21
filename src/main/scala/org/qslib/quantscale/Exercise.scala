@@ -101,7 +101,7 @@ class BermudanExercise(inputDates: Seq[LocalDate], override val payoffAtExpiry: 
     payoffAtExpiry == other.asInstanceOf[BermudanExercise].payoffAtExpiry &&
     allDates == other.asInstanceOf[BermudanExercise].allDates
 
-  override lazy val hashCode = payoffAtExpiry.hashCode + allDates.hashCode
+  override def hashCode = payoffAtExpiry.hashCode + allDates.hashCode
   override def toString = "BermudanExercise(" + allDates + ")"
 }
 

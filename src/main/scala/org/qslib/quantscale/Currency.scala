@@ -76,7 +76,7 @@ case class Currency(
   override def equals(obj: Any) = obj.isInstanceOf[Currency] && obj.asInstanceOf[Currency].code == code
 
   /** @return code's hash code */
-  override lazy val hashCode = code.hashCode()
+  override def hashCode = code.hashCode()
 
   /** Shortcut to declare money amounts such as EUR * 50.0 instead of Money(50.0, EUR) */
   def *(amount: Decimal)(implicit mcc: MoneyConversionConfig) = Money(amount, this)(mcc)

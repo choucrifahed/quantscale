@@ -26,7 +26,6 @@ import ExecutionContext.Implicits.global
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2003 RiskMap srl
 
