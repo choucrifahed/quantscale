@@ -56,7 +56,7 @@ import org.qslib.quantscale.math._
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
+final case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
   extends Ordered[Money] {
 
   // FIXME currency formats are odd!

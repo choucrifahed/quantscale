@@ -89,7 +89,7 @@ case object Ceiling extends RoundingType
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Rounding(precision: Int = 2, roundingType: RoundingType = Closest, digit: Int = 5) {
+final case class Rounding(precision: Int = 2, roundingType: RoundingType = Closest, digit: Int = 5) {
 
   def apply(value: Decimal): Decimal = {
     if (roundingType == None) value

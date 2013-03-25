@@ -58,7 +58,7 @@ import org.qslib.quantscale.math.Rounding
  * @author Choucri FAHED
  * @since 1.0
  */
-case class Currency(
+final case class Currency(
   name: String,
   code: String,
   numericCode: Int,

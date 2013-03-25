@@ -62,7 +62,7 @@ import ExchangeRateType._
  * @author Choucri FAHED
  * @since 1.0
  */
-case class ExchangeRate(source: Currency, target: Currency, rate: Decimal, erType: ExchangeRateType = Direct) {
+final case class ExchangeRate(source: Currency, target: Currency, rate: Decimal, erType: ExchangeRateType = Direct) {
   require(rate != 0.0, "An exchange rate cannot be equal to zero!")
 
   /** Applies the exchange rate to a cash amount. */
