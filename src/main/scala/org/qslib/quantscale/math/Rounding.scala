@@ -1,10 +1,3 @@
-package org.qslib.quantscale.math
-
-import scala.math.abs
-import scala.math.pow
-
-import org.qslib.quantscale.Decimal
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -26,7 +19,6 @@ import org.qslib.quantscale.Decimal
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2004 Decillion Pty(Ltd)
 
@@ -43,6 +35,13 @@ import org.qslib.quantscale.Decimal
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.math
+
+import scala.math.abs
+import scala.math.pow
+
+import org.qslib.quantscale.Decimal
 
 /**
  * ==Rounding Methods==
@@ -112,3 +111,5 @@ final case class Rounding(precision: Int = 2, roundingType: RoundingType = Close
     }
   }
 }
+
+case class Precision(p: Double) extends AnyVal

@@ -1,5 +1,3 @@
-package org.qslib.quantscale
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -39,8 +37,10 @@ package org.qslib.quantscale
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
+package org.qslib.quantscale
+
 /**
- * Abstract base class for option payoffs.
+ * Base trait for option payoffs.
  *
  * @author Choucri FAHED
  * @since 1.0

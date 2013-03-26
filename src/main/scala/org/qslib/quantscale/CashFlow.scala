@@ -39,6 +39,9 @@
 
 package org.qslib.quantscale
 
+import org.joda.time.LocalDate
+import org.qslib.quantscale.pattern.ObservableDefImpl
+
 /**
  * Base trait for cash flows.
  *
@@ -53,3 +56,31 @@ trait CashFlow extends Event {
    */
   def amount(): Money
 }
+
+/** This cash flow pays a predetermined amount at a given date. */
+class SimpleCashFlow(val date: LocalDate, val amount: Money) extends CashFlow with ObservableDefImpl with Equals {
+
+  override def toString = s"SimpleCashFlow(date=$date, amount=$amount)"
+
+  def canEqual(other: Any) = other.isInstanceOf[SimpleCashFlow]
+
+  override def equals(other: Any) = other match {
+    case that: SimpleCashFlow => that.canEqual(this) && date == that.date && amount == that.amount
+    case _ => false
+  }
+
+  override def hashCode() = 41 * (41 + date.hashCode) + amount.hashCode
+}
+
+object SimpleCashFlow {
+  def apply(date: LocalDate, amount: Money) = new SimpleCashFlow(date, amount)
+  def unapply(scf: SimpleCashFlow): Option[(LocalDate, Money)] = Some((scf.date, scf.amount))
+}
+
+/** Bond redemption */
+case class Redemption(override val date: LocalDate, override val amount: Money)
+  extends SimpleCashFlow(date, amount)
+
+/** Amortizing payment */
+case class AmortizingPayment(override val date: LocalDate, override val amount: Money)
+  extends SimpleCashFlow(date, amount)

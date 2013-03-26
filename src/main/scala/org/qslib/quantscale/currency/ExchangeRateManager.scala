@@ -1,13 +1,3 @@
-package org.qslib.quantscale.currency
-
-import org.scala_tools.time.Imports._
-import org.qslib.quantscale._
-import scala.util.Try
-import ExchangeRateType._
-import java.util.concurrent.ConcurrentHashMap
-import scala.util.Failure
-import scala.util.Success
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -46,6 +36,16 @@ import scala.util.Success
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.currency
+
+import org.scala_tools.time.Imports._
+import org.qslib.quantscale._
+import scala.util.Try
+import ExchangeRateType._
+import java.util.concurrent.ConcurrentHashMap
+import scala.util.Failure
+import scala.util.Success
 
 /**
  * Exchange-rate repository.

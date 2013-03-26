@@ -1,9 +1,3 @@
-package org.qslib.quantscale
-
-import scala.util.Failure
-import scala.util.Success
-import scala.util.Try
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -42,6 +36,12 @@ import scala.util.Try
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 object ExchangeRateType extends Enumeration {
   type ExchangeRateType = Value

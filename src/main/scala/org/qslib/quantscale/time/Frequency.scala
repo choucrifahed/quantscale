@@ -1,5 +1,3 @@
-package org.qslib.quantscale.time
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -40,6 +38,8 @@ package org.qslib.quantscale.time
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.time
 
 /**
  * Frequency of events.

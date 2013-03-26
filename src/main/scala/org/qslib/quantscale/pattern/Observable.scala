@@ -1,7 +1,3 @@
-package org.qslib.quantscale.pattern
-
-import java.util.concurrent.CopyOnWriteArraySet
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -41,6 +37,10 @@ import java.util.concurrent.CopyOnWriteArraySet
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.pattern
+
+import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Object that notifies its changes to a set of observers.

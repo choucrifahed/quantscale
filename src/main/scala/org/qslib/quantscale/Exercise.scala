@@ -1,7 +1,3 @@
-package org.qslib.quantscale
-
-import org.scala_tools.time.Imports._
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -41,6 +37,10 @@ import org.scala_tools.time.Imports._
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import org.scala_tools.time.Imports._
 
 /**
  * Option exercise classes.
@@ -92,17 +92,21 @@ case class AmericanExercise(earliestDate: LocalDate = MinDate, latestDate: Local
  * A Bermudan option can only be exercised at a set of fixed dates.
  */
 // Cannot be defined as a case class because input dates have to be sorted
-class BermudanExercise(inputDates: Seq[LocalDate], override val payoffAtExpiry: Boolean = false) extends EarlyExercise(payoffAtExpiry) {
+class BermudanExercise(inputDates: Seq[LocalDate], override val payoffAtExpiry: Boolean = false) extends EarlyExercise(payoffAtExpiry) with Equals {
   require(!inputDates.isEmpty, "no exercise date given")
 
   val allDates = inputDates.sortWith((date1, date2) => date1 <= date2)
 
-  override def equals(other: Any) = (other != null) && other.isInstanceOf[BermudanExercise] &&
-    payoffAtExpiry == other.asInstanceOf[BermudanExercise].payoffAtExpiry &&
-    allDates == other.asInstanceOf[BermudanExercise].allDates
-
-  override def hashCode = payoffAtExpiry.hashCode + allDates.hashCode
   override def toString = "BermudanExercise(" + allDates + ")"
+
+  def canEqual(other: Any) = other.isInstanceOf[BermudanExercise]
+
+  override def equals(other: Any) = other match {
+    case that: BermudanExercise => that.canEqual(this) && payoffAtExpiry == that.payoffAtExpiry && allDates == that.allDates
+    case _ => false
+  }
+
+  override def hashCode() = 41 * (41 + payoffAtExpiry.hashCode) + allDates.hashCode
 }
 
 // Methods used for instance creation and pattern matching

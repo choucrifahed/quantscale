@@ -1,7 +1,3 @@
-package org.qslib.quantscale
-
-import org.qslib.quantscale.math.Rounding
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -23,7 +19,6 @@ import org.qslib.quantscale.math.Rounding
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2004 Decillion Pty(Ltd)
  Copyright (C) 2004, 2005, 2006, 2007 StatPro Italia srl
@@ -41,6 +36,10 @@ import org.qslib.quantscale.math.Rounding
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import org.qslib.quantscale.math.Rounding
 
 /**
  * Currency specification.

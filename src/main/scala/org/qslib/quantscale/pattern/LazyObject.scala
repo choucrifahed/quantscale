@@ -1,10 +1,3 @@
-package org.qslib.quantscale.pattern
-
-import scala.util.Try
-import org.qslib.quantscale.Results
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -42,6 +35,13 @@ import ExecutionContext.Implicits.global
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.pattern
+
+import scala.util.Try
+import org.qslib.quantscale.Results
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 
 /**
  * Trait for on demand calculation and result caching.

@@ -20,24 +20,33 @@
  When applicable, the original copyright notice follows this notice.
  */
 
+import org.scala_tools.time.Imports._
 import org.qslib.quantscale._
+import Implicits._
+import Implicits.DefaultPrecision._
+import Implicits.DefaultMoneyConversionConfig._
 
 /**
  * Examples of using Money classes.
  */
 object money {
-  val eur_usd = ExchangeRate(EUR, USD, 1.2042)    //> eur_usd  : org.qslib.quantscale.ExchangeRate = ExchangeRate(EUR,USD,1.2042,D
-                                                  //| irect)
+  val eur_usd = ExchangeRate(EUR, USD, 1.2042)    //> eur_usd  : org.qslib.quantscale.ExchangeRate = ExchangeRate(EUR,USD,1.2042,
+                                                  //| Direct)
 
   val m1 = 50000.0 * EUR                          //> m1  : org.qslib.quantscale.Money = 50000.0 €
   val m2 = 100000.0 * USD                         //> m2  : org.qslib.quantscale.Money = 100000.0 $
 
-  val conversionType = NoConversion               //> conversionType  : org.qslib.quantscale.NoConversion.type = org.qslib.quants
-                                                  //| cale.NoConversion$@6ebbd7d
+  val conversionType = NoConversion               //> conversionType  : org.qslib.quantscale.NoConversion.type = NoConversion
 
   val calculated = eur_usd.exchange(m1).get       //> calculated  : org.qslib.quantscale.Money = 60210.0 $
   val expected = (m1.value * eur_usd.rate) * USD  //> expected  : org.qslib.quantscale.Money = 60210.0 $
 
   calculated == expected                          //> res0: Boolean = true
   calculated ~= expected                          //> res1: Boolean = true
+
+  val date1 = new LocalDate(2013, 1, 1)           //> date1  : org.joda.time.LocalDate = 2013-01-01
+
+  val scf = SimpleCashFlow(date1, 100 * EUR)      //> scf  : org.qslib.quantscale.SimpleCashFlow = SimpleCashFlow(date=2013-01-01
+                                                  //| , amount=100.0 €)
+
 }

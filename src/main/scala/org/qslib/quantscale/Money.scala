@@ -1,13 +1,3 @@
-package org.qslib.quantscale
-
-import scala.util.Try
-import scala.util.Success
-import scala.util.Failure
-
-import org.qslib.quantscale._
-import org.qslib.quantscale.currency._
-import org.qslib.quantscale.math._
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -46,6 +36,16 @@ import org.qslib.quantscale.math._
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
+
+import org.qslib.quantscale._
+import org.qslib.quantscale.currency._
+import org.qslib.quantscale.math._
 
 /**
  * Amount of cash.
@@ -168,7 +168,7 @@ final case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: M
    * Determines if 2 amounts of cash are almost equal or not.
    * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
    */
-  import AlmostEqual._
+  import Implicits._
   @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
   @inline def ~=(that: Money)(implicit p: Precision) = {
     val comparison = handleConversion(that)((a, b) => a.~=(b)(p))
@@ -209,8 +209,3 @@ case object BaseCurrencyConversion extends ConversionType
 case object AutomatedConversion extends ConversionType
 
 case class MoneyConversionConfig(conversionType: ConversionType, baseCurrency: Currency)
-
-object MoneyConversionDefaultConfig {
-  // TODO Move this a proper config file
-  implicit val moneyConversionConfig = MoneyConversionConfig(AutomatedConversion, EUR)
-}

@@ -1,5 +1,3 @@
-package org.qslib.quantscale
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -37,6 +35,8 @@ package org.qslib.quantscale
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
 
 sealed trait Compounding
 

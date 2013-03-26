@@ -1,8 +1,3 @@
-package org.qslib.quantscale.currency
-
-import org.qslib.quantscale.math._
-import org.qslib.quantscale.Currency
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -24,7 +19,6 @@ import org.qslib.quantscale.Currency
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2004, 2005, 2008 StatPro Italia srl
 
@@ -41,6 +35,11 @@ import org.qslib.quantscale.Currency
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.currency
+
+import org.qslib.quantscale.math._
+import org.qslib.quantscale.Currency
 
 /**
  * ==American Currencies==

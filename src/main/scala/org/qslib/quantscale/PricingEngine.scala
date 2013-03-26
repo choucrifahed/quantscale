@@ -1,11 +1,3 @@
-package org.qslib.quantscale
-
-import scala.util.Try
-import org.joda.time.DateTime
-import org.qslib.quantscale.pattern.Observable
-import org.qslib.quantscale.pattern.Observer
-import scala.concurrent.Future
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -27,7 +19,6 @@ import scala.concurrent.Future
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2002, 2003 Ferdinando Ametrano
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
@@ -46,6 +37,14 @@ import scala.concurrent.Future
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import scala.util.Try
+import org.joda.time.DateTime
+import org.qslib.quantscale.pattern.Observable
+import org.qslib.quantscale.pattern.Observer
+import scala.concurrent.Future
 
 /**
  * Interface for pricing engines.

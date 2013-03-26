@@ -1,13 +1,3 @@
-package org.qslib.quantscale
-
-import org.scalatest.FunSuite
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import math.AlmostEqual._
-import math.DefaultPrecision._
-import org.qslib.quantscale.currency.ExchangeRateManager
-import org.qslib.quantscale.math.Rounding
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -45,6 +35,16 @@ import org.qslib.quantscale.math.Rounding
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import org.scalatest.FunSuite
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.qslib.quantscale.currency.ExchangeRateManager
+import org.qslib.quantscale.math.Rounding
+import Implicits._
+import Implicits.DefaultPrecision._
 
 @RunWith(classOf[JUnitRunner])
 class MoneySuite extends FunSuite {

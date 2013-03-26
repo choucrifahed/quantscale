@@ -1,11 +1,3 @@
-package org.qslib.quantscale
-
-import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
-import org.qslib.quantscale.pattern.LazyObject
-import org.joda.time.DateTime
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -27,7 +19,6 @@ import org.joda.time.DateTime
  QuantScale is based on QuantLib. http://quantlib.org/
  When applicable, the original copyright notice follows this notice.
  */
-
 /*
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
  Copyright (C) 2003, 2004, 2005, 2006, 2007 StatPro Italia srl
@@ -45,6 +36,14 @@ import org.joda.time.DateTime
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale
+
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Success
+import org.qslib.quantscale.pattern.LazyObject
+import org.joda.time.DateTime
 
 /**
  * ==Instrument Trait==

@@ -1,14 +1,3 @@
-package org.qslib.quantscale.currency
-
-import org.scalatest.FunSuite
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.qslib.quantscale._
-import math.AlmostEqual._
-import math.DefaultPrecision._
-import org.scala_tools.time.Imports._
-import MoneyConversionDefaultConfig._
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -46,6 +35,17 @@ import MoneyConversionDefaultConfig._
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
+
+package org.qslib.quantscale.currency
+
+import org.scalatest.FunSuite
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.qslib.quantscale._
+import org.scala_tools.time.Imports._
+import org.qslib.quantscale.Implicits._
+import org.qslib.quantscale.Implicits.DefaultMoneyConversionConfig._
+import org.qslib.quantscale.Implicits.DefaultPrecision._
 
 @RunWith(classOf[JUnitRunner])
 class ExchangeRateSuite extends FunSuite {

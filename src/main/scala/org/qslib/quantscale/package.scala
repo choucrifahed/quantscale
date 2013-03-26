@@ -93,11 +93,4 @@ package object quantscale {
   val JPY = org.qslib.quantscale.currency.Asia.JPY
   val USD = org.qslib.quantscale.currency.America.USD
 
-  // Syntactic sugar
-  /** Shortcut to declare money amounts such as 50.0 * EUR instead of Money(50.0, EUR) */
-  implicit class DecimalToMoney(val value: Double) extends AnyVal {
-    def *(currency: Currency)(implicit mcc: MoneyConversionConfig) = Money(value, currency)(mcc)
-    def *(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value * money.value, money.currency)(mcc)
-    def /(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value / money.value, money.currency)(mcc)
-  }
 }
