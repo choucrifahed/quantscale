@@ -20,9 +20,7 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2002, 2003 Ferdinando Ametrano
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
- Copyright (C) 2007 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -40,49 +38,37 @@
 
 package org.qslib.quantscale
 
-import scala.util.Try
-import org.joda.time.DateTime
-import org.qslib.quantscale.pattern.Observable
-import org.qslib.quantscale.pattern.Observer
-import scala.concurrent.Future
+/** Option type enumeration. */
+sealed trait OptionType
+case object Put extends OptionType
+case object Call extends OptionType
 
 /**
- * Interface for pricing engines.
+ * Base trait of all options.
+ * It had to be called OptionInstrument to avoid confusion with Scala's Option trait.
  *
  * @author Choucri FAHED
  * @since 1.0
  */
-trait PricingEngine[A] extends Observable {
-
-  protected def validate(argument: A): Try[A]
-
-  def calculate(arguments: A*): Future[Results]
-
-  def update() {
-    notifyObservers()
-  }
+trait OptionInstrument {
+  def payoff: Payoff
+  def exercise: Exercise
+  def optionType: OptionType
 }
 
-// TODO consider moving to Money
-trait Results {
-  def value(): Real
-  def errorEstimate: Option[Real]
-  def valuationDate: DateTime
-  def additionalResults: Map[String, Any]
-
-  /**
-   * @return any additional result returned by the pricing engine.
-   */
-  final def result(tag: String): Option[Any] = try {
-    Some(additionalResults(tag))
-  } catch {
-    case e: NoSuchElementException => None
-  }
+trait Greeks {
+  def delta(): Option[Real] = None
+  def gamma(): Option[Real] = None
+  def theta(): Option[Real] = None
+  def vega(): Option[Real] = None
+  def rho(): Option[Real] = None
+  def dividendRho(): Option[Real] = None
 }
 
-object EmptyResults extends Results {
-  override val value = 0.0
-  override val errorEstimate = None
-  override val valuationDate = new DateTime()
-  override val additionalResults = Map[String, Any]()
+trait MoreGreeks {
+  def itmCashProbability(): Option[Real] = None
+  def deltaForward(): Option[Real] = None
+  def elasticity(): Option[Real] = None
+  def thetaPerDay(): Option[Real] = None
+  def strikeSensitivity(): Option[Real] = None
 }

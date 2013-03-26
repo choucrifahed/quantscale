@@ -39,7 +39,7 @@
 package org.qslib.quantscale.pattern
 
 import scala.util.Try
-import org.qslib.quantscale.Results
+import org.qslib.quantscale._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
@@ -55,7 +55,7 @@ trait LazyObject extends Observable with Observer {
   // FIXME not thread-safe!
   protected var calculated: Boolean = false
   protected var frozen: Boolean = false
-  protected var cachedResults: Future[Results] = future { Results() }
+  protected var cachedResults: Future[Results] = future { EmptyResults }
 
   /**
    * This method forces the recalculation of any results which would otherwise be cached.

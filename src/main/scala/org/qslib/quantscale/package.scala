@@ -77,11 +77,9 @@ package object quantscale {
 
   /** Information about a default-protection contract */
   // comes from default.hpp
-  object Side extends Enumeration {
-    type Side = Value
-
-    val Buyer, Seller = Value
-  }
+  sealed trait Side
+  case object Buyer extends Side
+  case object Seller extends Side
 
   val MinDate = new LocalDate(0, 1, 1)
   val MaxDate = new LocalDate(9999, 12, 31)

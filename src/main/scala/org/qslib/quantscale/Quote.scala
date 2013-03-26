@@ -20,9 +20,8 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2002, 2003 Ferdinando Ametrano
+ Copyright (C) 2007 Ferdinando Ametrano
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
- Copyright (C) 2007 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -40,49 +39,16 @@
 
 package org.qslib.quantscale
 
-import scala.util.Try
-import org.joda.time.DateTime
 import org.qslib.quantscale.pattern.Observable
-import org.qslib.quantscale.pattern.Observer
-import scala.concurrent.Future
 
 /**
- * Interface for pricing engines.
- *
- * @author Choucri FAHED
- * @since 1.0
+ * Base trait for market observables.
  */
-trait PricingEngine[A] extends Observable {
+trait Quote extends Observable {
 
-  protected def validate(argument: A): Try[A]
-
-  def calculate(arguments: A*): Future[Results]
-
-  def update() {
-    notifyObservers()
-  }
-}
-
-// TODO consider moving to Money
-trait Results {
+  /** @return the current value */
   def value(): Real
-  def errorEstimate: Option[Real]
-  def valuationDate: DateTime
-  def additionalResults: Map[String, Any]
 
-  /**
-   * @return any additional result returned by the pricing engine.
-   */
-  final def result(tag: String): Option[Any] = try {
-    Some(additionalResults(tag))
-  } catch {
-    case e: NoSuchElementException => None
-  }
-}
-
-object EmptyResults extends Results {
-  override val value = 0.0
-  override val errorEstimate = None
-  override val valuationDate = new DateTime()
-  override val additionalResults = Map[String, Any]()
+  /** @return true if the Quote holds a valid value */
+  def isValid(): Boolean
 }

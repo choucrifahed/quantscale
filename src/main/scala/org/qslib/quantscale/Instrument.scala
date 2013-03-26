@@ -104,7 +104,7 @@ trait Instrument[A] extends LazyObject {
    * state when the expiration condition is met.
    */
   protected def setupExpired() {
-    cachedResults = future { Results() }
+    cachedResults = future { EmptyResults }
   }
 
   /**
