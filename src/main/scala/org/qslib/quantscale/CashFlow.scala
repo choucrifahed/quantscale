@@ -20,7 +20,8 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2003 RiskMap srl
+ Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -36,11 +37,19 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale.pattern
+package org.qslib.quantscale
 
-// FIXME delete this class and replaces visitors with pattern matching
-trait Visitor[T] {
-  def visit(element: T)
+/**
+ * Base trait for cash flows.
+ *
+ * @author Choucri FAHED
+ * @since 1.0
+ */
+trait CashFlow extends Event {
+
+  /**
+   * The amount is not discounted, i.e.,
+   * it is the actual amount paid at the cash flow date.
+   */
+  def amount(): Money
 }
-
-trait AcyclicVisitor

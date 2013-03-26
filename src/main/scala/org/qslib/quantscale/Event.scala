@@ -1,11 +1,3 @@
-package org.qslib.quantscale
-
-import org.qslib.quantscale.pattern.Observable
-import org.scala_tools.time.Imports._
-import org.qslib.quantscale.pattern.AcyclicVisitor
-import org.qslib.quantscale.pattern.Visitor
-import org.qslib.quantscale.pattern.ObservableDefImpl
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -45,6 +37,14 @@ import org.qslib.quantscale.pattern.ObservableDefImpl
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
+package org.qslib.quantscale
+
+import org.qslib.quantscale.pattern.Observable
+import org.scala_tools.time.Imports._
+import org.qslib.quantscale.pattern.AcyclicVisitor
+import org.qslib.quantscale.pattern.Visitor
+import org.qslib.quantscale.pattern.ObservableDefImpl
+
 /**
  * Base class for events associated with a given date.
  * This class acts as a base class for the actual event implementations.
@@ -52,7 +52,7 @@ import org.qslib.quantscale.pattern.ObservableDefImpl
  * @author Choucri FAHED
  * @since 1.0
  */
-trait Event extends Observable {
+trait Event extends Observable with Ordered[Event] {
 
   /** @return the date at which the event occurs */
   def date(): LocalDate
@@ -63,8 +63,10 @@ trait Event extends Observable {
    * the event date is the same as the refDate.
    * @return true if an event has already occurred before a date
    */
-  def hasOccurred(refDate: LocalDate = LocalDate.now, includeRefDate: Boolean = false): Boolean =
+  final def hasOccurred(refDate: LocalDate = LocalDate.now, includeRefDate: Boolean = false): Boolean =
     if (includeRefDate) date < refDate else date <= refDate
+
+  @inline final def compare(that: Event): Int = date compare that.date
 }
 
 class SimpleEvent(val date: LocalDate) extends Event with ObservableDefImpl

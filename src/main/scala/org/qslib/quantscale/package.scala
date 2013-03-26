@@ -1,7 +1,3 @@
-package org.qslib
-
-import org.joda.time.LocalDate
-
 /*
  Copyright (C) 2013 Choucri FAHED
 
@@ -41,6 +37,10 @@ import org.joda.time.LocalDate
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
+package org.qslib
+
+import org.joda.time.LocalDate
+
 /**
  * ==Default QuantScale Types & Methods==
  *
@@ -71,6 +71,9 @@ package object quantscale {
 
   /** Volatility. */
   type Volatility = Double
+
+  /** A leg is simply a sequence of cash-flows */
+  type Leg = Seq[CashFlow]
 
   /** Information about a default-protection contract */
   // comes from default.hpp
