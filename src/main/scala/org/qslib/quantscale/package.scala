@@ -39,7 +39,7 @@
 
 package org.qslib
 
-import org.joda.time.LocalDate
+import org.scala_tools.time.Imports._
 
 /**
  * ==Default QuantScale Types & Methods==
@@ -91,4 +91,7 @@ package object quantscale {
   val JPY = org.qslib.quantscale.currency.Asia.JPY
   val USD = org.qslib.quantscale.currency.America.USD
 
+  implicit object LocalDateOrdering extends Ordering[LocalDate] {
+    def compare(x: LocalDate, y: LocalDate) = x compareTo y
+  }
 }

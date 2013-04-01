@@ -73,11 +73,7 @@ trait Results {
   /**
    * @return any additional result returned by the pricing engine.
    */
-  final def result(tag: String): Option[Any] = try {
-    Some(additionalResults(tag))
-  } catch {
-    case e: NoSuchElementException => None
-  }
+  final def result(tag: String): Option[Any] = additionalResults get tag
 }
 
 object EmptyResults extends Results {
