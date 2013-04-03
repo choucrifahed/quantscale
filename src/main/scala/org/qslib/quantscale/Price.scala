@@ -39,6 +39,7 @@
 */
 
 package org.qslib.quantscale
+
 import org.joda.time.LocalDate
 
 sealed trait PriceType
@@ -95,20 +96,18 @@ case class IntervalPrice(open: Money, close: Money, high: Money, low: Money) {
 
 object IntervalPrice {
   def makeSeries(
-    dates: List[LocalDate],
-    open: List[Money],
-    close: List[Money],
-    high: List[Money],
+    dates: Seq[LocalDate],
+    open: Seq[Money],
+    close: Seq[Money],
+    high: Seq[Money],
     low: Seq[Money]): TimeSeries[IntervalPrice] = {
 
     require(open.size == close.size, "Open and close price sequences should must the same length!")
     require(open.size == high.size, "Open and high price sequences should must the same length!")
     require(open.size == low.size, "Open and low price sequences should must the same length!")
 
-    val values = Seq(open, close, high, low).transpose map { list =>
-      list match {
-        case Seq(open, close, high, low) => IntervalPrice(open, close, high, low)
-      }
+    val values = Seq(open, close, high, low).transpose map {
+      case Seq(open, close, high, low) => IntervalPrice(open, close, high, low)
     }
 
     TimeSeries(dates, values)

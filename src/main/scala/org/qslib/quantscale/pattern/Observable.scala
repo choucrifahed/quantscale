@@ -54,7 +54,7 @@ trait Observable {
 // FIXME check trait Listeners in Akka!
 // TODO Move to test directory when Akka impl is ready
 trait ObservableDefImpl extends Observable {
-  private val observers = new CopyOnWriteArraySet[Observer]
+  private[this] val observers = new CopyOnWriteArraySet[Observer]
 
   def notifyObservers() {
     observers.toArray.toList.asInstanceOf[List[Observer]].foreach(_.update)
@@ -81,7 +81,7 @@ trait Observer {
 trait ObserverDefImpl extends Observer {
   // TODO Consider using actors!
   // FIXME check trait Listeners in Akka!
-  private val observables = new CopyOnWriteArraySet[Observable]
+  private[this] val observables = new CopyOnWriteArraySet[Observable]
 
   def registerWith(observable: Observable) {
     observable registerObserver this
