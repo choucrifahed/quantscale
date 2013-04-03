@@ -4,7 +4,7 @@ name := "quantscale"
 
 version := "0.1.0"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.1"
 
 scalacOptions <++= scalaVersion map { v =>
   if (v.startsWith("2.10"))
@@ -14,10 +14,11 @@ scalacOptions <++= scalaVersion map { v =>
 }
 
 libraryDependencies ++= Seq(
-  "org.scalanlp" %% "breeze-math" % "0.2-SNAPSHOT",
-  "org.scalanlp" %% "breeze-learn" % "0.2-SNAPSHOT",
-  "org.scalanlp" %% "breeze-process" % "0.2-SNAPSHOT",
-  "org.scalanlp" %% "breeze-viz" % "0.2-SNAPSHOT",
+  "org.scala-saddle" %% "saddle" % "1.0.1",
+  "org.scalanlp" %% "breeze-math" % "0.2",
+  "org.scalanlp" %% "breeze-learn" % "0.2",
+  "org.scalanlp" %% "breeze-process" % "0.2",
+  "org.scalanlp" %% "breeze-viz" % "0.2",
   "org.scalaj" % "scalaj-time_2.9.2" % "0.6",
   "net.objectlab.kit" % "datecalc-common" % "1.2.0",
   "net.objectlab.kit" % "datecalc-joda" % "1.2.0",
