@@ -41,6 +41,9 @@
 package org.qslib.quantscale
 
 import org.joda.time.LocalDate
+import org.saddle.Vec
+import org.saddle.Series
+import org.saddle.Mat
 
 sealed trait PriceType
 case object Bid extends PriceType
@@ -96,26 +99,26 @@ case class IntervalPrice(open: Money, close: Money, high: Money, low: Money) {
 
 object IntervalPrice {
   def makeSeries(
-    dates: Seq[LocalDate],
-    open: Seq[Money],
-    close: Seq[Money],
-    high: Seq[Money],
-    low: Seq[Money]): TimeSeries[IntervalPrice] = {
+    dates: Vec[LocalDate],
+    open: Vec[Money],
+    close: Vec[Money],
+    high: Vec[Money],
+    low: Vec[Money]): TimeSeries[IntervalPrice] = {
 
-    require(open.size == close.size, "Open and close price sequences should must the same length!")
-    require(open.size == high.size, "Open and high price sequences should must the same length!")
-    require(open.size == low.size, "Open and low price sequences should must the same length!")
+    require(open.length == close.length, "Open and close price vectors should must the same length!")
+    require(open.length == high.length, "Open and high price vectors should must the same length!")
+    require(open.length == low.length, "Open and low price vectors should must the same length!")
 
-    val values = Seq(open, close, high, low).transpose map {
-      case Seq(open, close, high, low) => IntervalPrice(open, close, high, low)
+    val values = Mat(open, close, high, low).rows map {
+      v => IntervalPrice(v.raw(0), v.raw(1), v.raw(2), v.raw(3))
     }
 
-    TimeSeries(dates, values)
+    Series(Vec(values: _*), dates)
   }
 
-  def extractValues(intervalPriceTimeSeries: TimeSeries[IntervalPrice], field: IntervalPriceField): Iterable[Money] =
+  def extractValues(intervalPriceTimeSeries: TimeSeries[IntervalPrice], field: IntervalPriceField): Vec[Money] =
     intervalPriceTimeSeries.values.map(intervalPrice => intervalPrice(field))
 
   def extractComponent(intervalPriceTimeSeries: TimeSeries[IntervalPrice], field: IntervalPriceField): TimeSeries[Money] =
-    new TimeSeries(intervalPriceTimeSeries.map.mapValues(intervalPrice => intervalPrice(field)))
+    intervalPriceTimeSeries.mapValues(intervalPrice => intervalPrice(field))
 }

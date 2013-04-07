@@ -39,35 +39,38 @@
 
 package org.qslib.quantscale
 
-import org.scala_tools.time.Imports._
-import scala.collection.generic.ImmutableSortedMapFactory
-import scala.collection.generic.CanBuildFrom
-import scala.collection.SortedMap
-import scala.collection.immutable.TreeMap
-import org.saddle.Series
+import org.joda.time.LocalDate
+import org.junit.runner.RunWith
+import org.qslib.quantscale.Implicits.DecimalToMoney
+import org.qslib.quantscale.Implicits.DefaultMoneyConversionConfig.moneyConversionConfig
 import org.saddle.Vec
-import scala.reflect.ClassTag
+import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 
-object TimeSeries {
+@RunWith(classOf[JUnitRunner])
+class TimeSeriesSuite extends FunSuite {
 
-  /** This method initializes the history with a set of date / value pairs. */
-  def apply[T: ClassTag](pairs: (LocalDate, T)*): TimeSeries[T] = Series(pairs: _*)
+  test("Construction test") {
+    val ts = TimeSeries(
+      new LocalDate(2005, 3, 25) -> 1.2,
+      new LocalDate(2005, 3, 29) -> 2.3,
+      new LocalDate(2005, 3, 15) -> 0.3).sortedIx
 
-  /**
-   * This method initializes the history with a set of values passed as two sequences,
-   * the first containing dates and the second containing corresponding values.
-   */
-  def apply[T: ClassTag](values: Vec[T], dates: Vec[LocalDate]): TimeSeries[T] = {
-    require(dates.length == values.length, "The date and value vectors should have the same length!")
-    Series(values, dates)
+    assert(ts.firstKey.get == new LocalDate(2005, 3, 15), "Date does not match")
+    assert(ts.first.get == 0.3, "Value does not match")
   }
 
-  /**
-   * This method initializes the history with a set of values. Such values are assigned
-   * to a corresponding number of consecutive dates starting from <b><i>firstDate</i></b> included.
-   */
-  def apply[T: ClassTag](values: Vec[T], firstDate: LocalDate): TimeSeries[T] = {
-    val dates = (0 to (values.length - 1)).map(days => firstDate plusDays days).toArray
-    Series(values, dates)
+  test("Time series interval price test") {
+    val dates = Vec(new LocalDate(2005, 3, 25), new LocalDate(2005, 3, 29))
+
+    val open = Vec(1.3 * EUR, 2.3 * EUR)
+    val close = Vec(2.3 * EUR, 3.4 * EUR)
+    val high = Vec(3.4 * EUR, 3.5 * EUR)
+    val low = Vec(3.4 * EUR, 3.2 * EUR)
+
+    val ipts = IntervalPrice.makeSeries(dates, open, close, high, low)
+
+    assert(ipts.first.get == IntervalPrice(1.3 * EUR, 2.3 * EUR, 3.4 * EUR, 3.4 * EUR),
+      "Interval price time series not built correctly")
   }
 }

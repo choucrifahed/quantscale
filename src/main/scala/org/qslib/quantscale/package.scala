@@ -40,6 +40,7 @@
 package org.qslib
 
 import org.scala_tools.time.Imports._
+import org.saddle.Series
 
 /**
  * ==Default QuantScale Types & Methods==
@@ -74,6 +75,15 @@ package object quantscale {
 
   /** A leg is simply a sequence of cash-flows */
   type Leg = Seq[CashFlow]
+
+  /**
+   * ==Container for Historical Data==
+   *
+   * This class acts as a generic repository for a set of historical data.
+   * Any single datum can be accessed through its date, while sets of
+   * consecutive data can be accessed through iterators.
+   */
+  type TimeSeries[T] = Series[LocalDate, T]
 
   /** Information about a default-protection contract */
   // comes from default.hpp
