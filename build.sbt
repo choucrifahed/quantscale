@@ -14,6 +14,8 @@ scalacOptions <++= scalaVersion map { v =>
 }
 
 libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor" % "2.2-20130208-001240",
+  "com.typesafe.akka" %% "akka-agent" % "2.2-20130208-001240",
   "org.scala-saddle" %% "saddle" % "1.0.1",
   "org.scalanlp" %% "breeze-math" % "0.2",
   "org.scalanlp" %% "breeze-learn" % "0.2",
@@ -27,7 +29,8 @@ libraryDependencies ++= Seq(
 )
 
 resolvers ++= Seq(
-  "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+  "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
+  "Akka Nightlies" at " http://repo.akka.io/snapshots/"
 )
 
 parallelExecution in Test := false

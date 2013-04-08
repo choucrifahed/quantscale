@@ -20,8 +20,9 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2006 Joseph Wang
- Copyright (C) 2010 Liquidnet Holdings Inc.
+ Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2003 Ferdinando Ametrano
+ Copyright (C) 2007 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -37,39 +38,16 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.instrument
 
-import org.joda.time.LocalDate
-import org.junit.runner.RunWith
-import org.qslib.quantscale.Implicits._
-import org.saddle.Vec
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.qslib.quantscale.OptionInstrument
 
-@RunWith(classOf[JUnitRunner])
-class TimeSeriesSuite extends FunSuite {
+/**
+ * Option on a single asset.
+ * 
+ * @author Choucri FAHED
+ * @since 1.0
+ */
+trait OneAssetOption extends OptionInstrument {
 
-  test("Construction test") {
-    val ts = TimeSeries(
-      new LocalDate(2005, 3, 25) -> 1.2,
-      new LocalDate(2005, 3, 29) -> 2.3,
-      new LocalDate(2005, 3, 15) -> 0.3).sortedIx
-
-    assert(ts.firstKey.get == new LocalDate(2005, 3, 15), "Date does not match")
-    assert(ts.first.get == 0.3, "Value does not match")
-  }
-
-  test("Time series interval price test") {
-    val dates = Vec(new LocalDate(2005, 3, 25), new LocalDate(2005, 3, 29))
-
-    val open = Vec(1.3 * EUR, 2.3 * EUR)
-    val close = Vec(2.3 * EUR, 3.4 * EUR)
-    val high = Vec(3.4 * EUR, 3.5 * EUR)
-    val low = Vec(3.4 * EUR, 3.2 * EUR)
-
-    val ipts = IntervalPrice.makeSeries(dates, open, close, high, low)
-
-    assert(ipts.first.get == IntervalPrice(1.3 * EUR, 2.3 * EUR, 3.4 * EUR, 3.4 * EUR),
-      "Interval price time series not built correctly")
-  }
 }

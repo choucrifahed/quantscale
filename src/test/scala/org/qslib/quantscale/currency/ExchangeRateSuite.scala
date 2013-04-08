@@ -44,8 +44,6 @@ import org.scalatest.junit.JUnitRunner
 import org.qslib.quantscale._
 import org.scala_tools.time.Imports._
 import org.qslib.quantscale.Implicits._
-import org.qslib.quantscale.Implicits.DefaultMoneyConversionConfig._
-import org.qslib.quantscale.Implicits.DefaultPrecision._
 
 @RunWith(classOf[JUnitRunner])
 class ExchangeRateSuite extends FunSuite {

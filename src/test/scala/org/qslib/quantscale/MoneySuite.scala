@@ -43,8 +43,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.qslib.quantscale.currency.ExchangeRateManager
 import org.qslib.quantscale.math.Rounding
-import Implicits._
-import Implicits.DefaultPrecision._
+import Implicits.{DecimalToMoney, AlmostEqualDecimal, defaultPrecision}
 
 @RunWith(classOf[JUnitRunner])
 class MoneySuite extends FunSuite {

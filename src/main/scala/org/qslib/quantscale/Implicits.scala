@@ -33,13 +33,8 @@ object Implicits {
   // Implicit values
   // TODO Move this to a proper config file
 
-  object DefaultMoneyConversionConfig {
-    implicit val moneyConversionConfig = MoneyConversionConfig(AutomatedConversion, EUR)
-  }
-
-  object DefaultPrecision {
-    implicit val precision = math.Precision(0.00001)
-  }
+  implicit val defaultMoneyConversionConfig = MoneyConversionConfig(AutomatedConversion, EUR)
+  implicit val defaultPrecision = math.Precision(0.00001)
 
   // Implicit classes for syntactic sugar
 
