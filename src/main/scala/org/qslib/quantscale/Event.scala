@@ -69,4 +69,4 @@ trait Event extends Observable with Ordered[Event] {
   @inline final def compare(that: Event): Int = date compare that.date
 }
 
-class SimpleEvent(val date: LocalDate) extends Event with ObservableDefImpl
+case class SimpleEvent(date: LocalDate) extends Event with ObservableDefImpl

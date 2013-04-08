@@ -50,25 +50,25 @@ case object Call extends OptionType
  * @author Choucri FAHED
  * @since 1.0
  */
-trait OptionInstrument {
-  def payoff: Payoff
-  def exercise: Exercise
-  def optionType: OptionType
+trait OptionInstrument extends Instrument {
+  def payoff(): Payoff
+  def exercise(): Exercise
+  def optionType(): OptionType
 }
 
 trait Greeks {
-  def delta(): Option[Real] = None
-  def gamma(): Option[Real] = None
-  def theta(): Option[Real] = None
-  def vega(): Option[Real] = None
-  def rho(): Option[Real] = None
-  def dividendRho(): Option[Real] = None
+  def delta(): Option[Real]
+  def gamma(): Option[Real]
+  def theta(): Option[Real]
+  def vega(): Option[Real]
+  def rho(): Option[Real]
+  def dividendRho(): Option[Real]
 }
 
 trait MoreGreeks {
-  def itmCashProbability(): Option[Real] = None
-  def deltaForward(): Option[Real] = None
-  def elasticity(): Option[Real] = None
-  def thetaPerDay(): Option[Real] = None
-  def strikeSensitivity(): Option[Real] = None
+  def itmCashProbability(): Option[Real]
+  def deltaForward(): Option[Real]
+  def elasticity(): Option[Real]
+  def thetaPerDay(): Option[Real]
+  def strikeSensitivity(): Option[Real]
 }

@@ -42,6 +42,7 @@ import scala.util.Try
 import org.qslib.quantscale._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
+import rx.Var
 
 /**
  * Trait for on demand calculation and result caching.
@@ -51,11 +52,13 @@ import ExecutionContext.Implicits.global
  */
 // FIXME Find a more functional way of solving this problem
 trait LazyObject extends Observable with Observer {
+  type ResultsType <: Results
 
-  // FIXME not thread-safe!
-  protected var calculated: Boolean = false
-  protected var frozen: Boolean = false
-  protected var cachedResults: Future[Results] = future { EmptyResults }
+  protected val calculated: Var[Boolean] = Var(false)
+  protected val frozen: Var[Boolean] = Var(false)
+  protected val cachedResults: Var[Future[ResultsType]] = Var(future { emptyResults })
+
+  protected val emptyResults: ResultsType
 
   /**
    * This method forces the recalculation of any results which would otherwise be cached.
@@ -63,14 +66,14 @@ trait LazyObject extends Observable with Observer {
    * itself as observer with the structures on which such results depend.
    * It is strongly advised to follow this policy when possible.
    */
-  def recalculate(): Future[Results] = {
-    val wasFrozen = frozen
-    calculated = false
-    frozen = false
+  def recalculate(): Future[ResultsType] = {
+    val wasFrozen = frozen()
+    calculated() = false
+    frozen() = false
     try {
       calculate()
     } finally {
-      frozen = wasFrozen
+      frozen() = wasFrozen
       notifyObservers()
     }
   }
@@ -80,7 +83,7 @@ trait LazyObject extends Observable with Observer {
    * invocations, even if arguments upon which they depend should change.
    */
   def freeze() {
-    frozen = true
+    frozen() = true
   }
 
   /**
@@ -90,8 +93,8 @@ trait LazyObject extends Observable with Observer {
   def unfreeze() {
     // send notifications, just in case we lost any,
     // but only once, i.e. if it was frozen
-    if (frozen) {
-      frozen = false
+    if (frozen()) {
+      frozen() = false
       notifyObservers()
     }
   }
@@ -109,31 +112,31 @@ trait LazyObject extends Observable with Observer {
    * WARNING: Should this method be redefined in derived classes, LazyObject.calculate()
    * should be called in the overriding method.
    */
-  protected def calculate(): Future[Results] = {
-    if (!calculated && !frozen) {
-      calculated = true // prevent infinite recursion in case of bootstrapping
-      cachedResults = performCalculations()
+  protected def calculate(): Future[ResultsType] = {
+    if (!calculated() && !frozen()) {
+      calculated() = true // prevent infinite recursion in case of bootstrapping
+      cachedResults() = performCalculations()
     }
-    cachedResults
+    cachedResults()
   }
 
   /**
    * This method must implement any calculations which must be
    * (re)done in order to calculate the desired results.
    */
-  protected def performCalculations(): Future[Results]
+  protected def performCalculations(): Future[ResultsType]
 
   def update() {
     // forwards notifications only the first time
-    if (calculated) {
+    if (calculated()) {
       // set to false early
       // 1) to prevent infinite recursion
       // 2) otherwise non-lazy observers would be served obsolete
       //    data because of calculated being still true
-      calculated = false;
+      calculated() = false;
       // observers don't expect notifications from frozen objects
-      if (!frozen) {
-        notifyObservers();
+      if (!frozen()) {
+        notifyObservers()
         // exiting notifyObservers() calculated could be
         // already true because of non-lazy observers
       }

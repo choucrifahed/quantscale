@@ -75,10 +75,3 @@ trait Results {
    */
   final def result(tag: String): Option[Any] = additionalResults get tag
 }
-
-object EmptyResults extends Results {
-  override val value = 0.0
-  override val errorEstimate = None
-  override val valuationDate = new DateTime()
-  override val additionalResults = Map[String, Any]()
-}

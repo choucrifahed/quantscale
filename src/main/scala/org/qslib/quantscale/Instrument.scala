@@ -53,7 +53,7 @@ import org.joda.time.DateTime
  * @author Choucri FAHED
  * @since 1.0
  */
-trait Instrument[A] extends LazyObject {
+trait Instrument extends LazyObject {
 
   //  private var _engine: Option[PricingEngine[A]] = None // Might want to use multiple ones, why not make it an implicit parameter
   //
@@ -66,8 +66,6 @@ trait Instrument[A] extends LazyObject {
   //    // trigger (lazy) recalculation and notify observers
   //    update()
   //  }
-
-  // FIXME This class is not thread-safe!!!
 
   /**
    * @return the net present value of the instrument.
@@ -92,8 +90,8 @@ trait Instrument[A] extends LazyObject {
   override protected def calculate() = {
     if (isExpired()) {
       setupExpired()
-      calculated = true
-      cachedResults
+      calculated() = true
+      cachedResults()
     } else {
       super.calculate
     }
@@ -104,7 +102,7 @@ trait Instrument[A] extends LazyObject {
    * state when the expiration condition is met.
    */
   protected def setupExpired() {
-    cachedResults = future { EmptyResults }
+    cachedResults() = future { emptyResults }
   }
 
   /**
@@ -114,7 +112,7 @@ trait Instrument[A] extends LazyObject {
    * a pricing engine is used, the default implementation
    * can be used.
    */
-  protected def performCalculations()(implicit engine: PricingEngine[A]) = engine.calculate()
+  protected def performCalculations()(implicit engine: PricingEngine[Instrument]) = engine.calculate()
 }
 
 
