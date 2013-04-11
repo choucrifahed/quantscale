@@ -58,19 +58,19 @@ trait OneAssetOption extends OptionInstrument {
   override def isExpired = SimpleEvent(exercise.lastDate).hasOccurred()
 
   // Greeks
-  def delta() = calculate() map (_.delta)
-  def gamma() = calculate() map (_.gamma)
-  def theta() = calculate() map (_.theta)
-  def vega() = calculate() map (_.vega)
-  def rho() = calculate() map (_.rho)
-  def dividendRho() = calculate() map (_.dividendRho)
+  def delta()(implicit engine: PricingEngine) = calculate() map (_.delta)
+  def gamma()(implicit engine: PricingEngine) = calculate() map (_.gamma)
+  def theta()(implicit engine: PricingEngine) = calculate() map (_.theta)
+  def vega()(implicit engine: PricingEngine) = calculate() map (_.vega)
+  def rho()(implicit engine: PricingEngine) = calculate() map (_.rho)
+  def dividendRho()(implicit engine: PricingEngine) = calculate() map (_.dividendRho)
 
   // More Greeks
-  def itmCashProbability() = calculate() map (_.itmCashProbability)
-  def deltaForward() = calculate() map (_.deltaForward)
-  def elasticity() = calculate() map (_.elasticity)
-  def thetaPerDay() = calculate() map (_.thetaPerDay)
-  def strikeSensitivity() = calculate() map (_.strikeSensitivity)
+  def itmCashProbability()(implicit engine: PricingEngine) = calculate() map (_.itmCashProbability)
+  def deltaForward()(implicit engine: PricingEngine) = calculate() map (_.deltaForward)
+  def elasticity()(implicit engine: PricingEngine) = calculate() map (_.elasticity)
+  def thetaPerDay()(implicit engine: PricingEngine) = calculate() map (_.thetaPerDay)
+  def strikeSensitivity()(implicit engine: PricingEngine) = calculate() map (_.strikeSensitivity)
 }
 
 /** Results from single-asset option calculation */

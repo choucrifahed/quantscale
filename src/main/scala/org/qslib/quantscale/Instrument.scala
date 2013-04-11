@@ -40,6 +40,7 @@
 package org.qslib.quantscale
 
 import scala.concurrent._
+import scala.concurrent.stm._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Success
 import org.qslib.quantscale.pattern.LazyObject
@@ -70,10 +71,10 @@ trait Instrument extends LazyObject {
   /**
    * @return the net present value of the instrument.
    */
-  def NPF = calculate() map (_.value)
-  def errorEstimate = calculate() map (_.errorEstimate)
-  def valuationDate = calculate() map (_.valuationDate)
-  def additionalResults = calculate() map (_.additionalResults)
+  def NPF()(implicit engine: PricingEngine) = calculate() map (_.value)
+  def errorEstimate()(implicit engine: PricingEngine) = calculate() map (_.errorEstimate)
+  def valuationDate()(implicit engine: PricingEngine) = calculate() map (_.valuationDate)
+  def additionalResults()(implicit engine: PricingEngine) = calculate() map (_.additionalResults)
 
   /**
    * @return whether the instrument might have value greater than zero.
@@ -87,7 +88,7 @@ trait Instrument extends LazyObject {
    */
   def fetchResults(): Results
 
-  override protected def calculate() = {
+  override protected def calculate()(implicit engine: PricingEngine) = atomic { implicit txn =>
     if (isExpired()) {
       setupExpired()
       calculated() = true
@@ -102,7 +103,7 @@ trait Instrument extends LazyObject {
    * state when the expiration condition is met.
    */
   protected def setupExpired() {
-    cachedResults() = future { emptyResults }
+    cachedResults.single() = future { emptyResults }
   }
 
   /**
@@ -112,7 +113,7 @@ trait Instrument extends LazyObject {
    * a pricing engine is used, the default implementation
    * can be used.
    */
-  protected def performCalculations()(implicit engine: PricingEngine[Instrument]) = engine.calculate()
+  override protected def performCalculations()(implicit engine: PricingEngine) = engine.calculate(this)
 }
 
 

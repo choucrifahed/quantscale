@@ -52,11 +52,11 @@ import scala.concurrent.Future
  * @author Choucri FAHED
  * @since 1.0
  */
-trait PricingEngine[A] extends Observable {
+trait PricingEngine extends Observable {
 
-  protected def validate(argument: A): Try[A]
+  //protected def validate(argument: A): Try[A]
 
-  def calculate(arguments: A*): Future[Results]
+  def calculate(instrument: Instrument): Future[instrument.ResultsType]
 
   def update() {
     notifyObservers()

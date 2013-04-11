@@ -42,7 +42,7 @@ import scala.util.Try
 import org.qslib.quantscale._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-import rx.Var
+import scala.concurrent.stm._
 
 /**
  * Trait for on demand calculation and result caching.
@@ -54,9 +54,9 @@ import rx.Var
 trait LazyObject extends Observable with Observer {
   type ResultsType <: Results
 
-  protected val calculated: Var[Boolean] = Var(false)
-  protected val frozen: Var[Boolean] = Var(false)
-  protected val cachedResults: Var[Future[ResultsType]] = Var(future { emptyResults })
+  protected val frozen: Ref[Boolean] = Ref(false)
+  protected val calculated: Ref[Boolean] = Ref(false)
+  protected val cachedResults: Ref[Future[ResultsType]] = Ref(future { emptyResults })
 
   protected val emptyResults: ResultsType
 
@@ -66,7 +66,7 @@ trait LazyObject extends Observable with Observer {
    * itself as observer with the structures on which such results depend.
    * It is strongly advised to follow this policy when possible.
    */
-  def recalculate(): Future[ResultsType] = {
+  def recalculate()(implicit engine: PricingEngine): Future[ResultsType] = atomic { implicit txn =>
     val wasFrozen = frozen()
     calculated() = false
     frozen() = false
@@ -83,14 +83,14 @@ trait LazyObject extends Observable with Observer {
    * invocations, even if arguments upon which they depend should change.
    */
   def freeze() {
-    frozen() = true
+    frozen.single() = true
   }
 
   /**
    * This method reverts the effect of the '''''freeze''''' method, thus re-enabling
    * recalculations.
    */
-  def unfreeze() {
+  def unfreeze() = atomic { implicit txn =>
     // send notifications, just in case we lost any,
     // but only once, i.e. if it was frozen
     if (frozen()) {
@@ -112,7 +112,7 @@ trait LazyObject extends Observable with Observer {
    * WARNING: Should this method be redefined in derived classes, LazyObject.calculate()
    * should be called in the overriding method.
    */
-  protected def calculate(): Future[ResultsType] = {
+  protected def calculate()(implicit engine: PricingEngine): Future[ResultsType] = atomic { implicit txn =>
     if (!calculated() && !frozen()) {
       calculated() = true // prevent infinite recursion in case of bootstrapping
       cachedResults() = performCalculations()
@@ -124,16 +124,16 @@ trait LazyObject extends Observable with Observer {
    * This method must implement any calculations which must be
    * (re)done in order to calculate the desired results.
    */
-  protected def performCalculations(): Future[ResultsType]
+  protected def performCalculations()(implicit engine: PricingEngine): Future[ResultsType]
 
-  def update() {
+  def update() = atomic { implicit txn =>
     // forwards notifications only the first time
     if (calculated()) {
       // set to false early
       // 1) to prevent infinite recursion
       // 2) otherwise non-lazy observers would be served obsolete
       //    data because of calculated being still true
-      calculated() = false;
+      calculated() = false
       // observers don't expect notifications from frozen objects
       if (!frozen()) {
         notifyObservers()
