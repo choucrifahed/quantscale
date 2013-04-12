@@ -164,18 +164,27 @@ final case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: M
     comparison.get
   }
 
+  @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
+  @inline def max(that: Money): Money = if ((this compare that) >= 0) this else that
+
   /**
    * Determines if 2 amounts of cash are almost equal or not.
    * @throws IllegalArgumentException if amounts have different currencies and no conversion is specified
    */
   import Implicits._
   @throws[IllegalArgumentException]("if amounts have different currencies and no conversion is specified")
-  @inline def ~=(that: Money)(implicit p: Precision) = {
-    val comparison = handleConversion(that)((a, b) => a.~=(b)(p))
+  @inline def ~=(that: Money) = {
+    val comparison = handleConversion(that)((a, b) => a ~= b)
 
     // This is where an exception can be thrown
     comparison.get
   }
+
+  @inline def isZero = value ~= 0.0
+  @inline def isPositive = value >= 0.0
+  @inline def isNegative = value <= 0.0
+  @inline def isStrictlyPositive = value > 0.0
+  @inline def isStrictlyNegative = value < 0.0
 
   private def handleConversion[R](that: Money)(op: (Decimal, Decimal) => R): Try[R] = {
     if (currency == that.currency) Success(op(value, that.value))

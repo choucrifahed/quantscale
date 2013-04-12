@@ -85,6 +85,9 @@ package object quantscale {
    */
   type TimeSeries[T] = Series[LocalDate, T]
 
+  /** Base type for option payoffs. */
+  type Payoff = Function1[Money, Money]
+
   /** Information about a default-protection contract */
   // comes from default.hpp
   sealed trait Side
