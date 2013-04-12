@@ -37,17 +37,28 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.quote
 
-import org.qslib.quantscale.pattern.Observable
+import org.qslib.quantscale.pattern._
+import org.qslib.quantscale._
+import scala.concurrent.stm._
 
-/**
- * Base trait for market observables.
- *
- * @param T either Money or Real
- */
-trait Quote[T] extends Observable {
+/** Market element returning a stored value. */
+class SimpleQuote(initialValue: Option[Real] = None) extends Quote[Real] with ObservableDefImpl {
+  // FIXME consider moving to Agents or ScalaRX
+  private[this] val valueRef: Ref[Option[Real]] = Ref(initialValue)
 
-  /** @return the current value */
-  def value(): Option[T]
+  def value() = valueRef.single()
+
+  /** @return the difference between the new and old value */
+  def setValue(newValue: Real): Real = atomic { implicit txn =>
+    val diff = newValue - valueRef().getOrElse(0.0)
+    if (diff != 0.0) {
+      valueRef() = Some(newValue)
+      notifyObservers()
+    }
+    diff
+  }
+
+  def reset() = valueRef.single() = None
 }
