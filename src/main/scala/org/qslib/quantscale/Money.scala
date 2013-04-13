@@ -56,7 +56,7 @@ import org.qslib.quantscale.math._
  * @author Choucri FAHED
  * @since 1.0
  */
-final case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
+case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyConversionConfig)
   extends Ordered[Money] {
 
   // FIXME currency formats are odd!
@@ -199,6 +199,11 @@ final case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: M
       case NoConversion => Failure(new IllegalArgumentException("Cannot convert amounts of different currencies with no conversion specified."))
     }
   }
+}
+
+object Money {
+  def zero(currency: Currency)(implicit mcc: MoneyConversionConfig) = Money(0.0, currency)
+  def zero()(implicit mcc: MoneyConversionConfig) = Money(0.0, mcc.baseCurrency)
 }
 
 /**

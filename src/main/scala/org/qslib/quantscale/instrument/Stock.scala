@@ -20,9 +20,7 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2002, 2003 Ferdinando Ametrano
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
- Copyright (C) 2007 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -38,44 +36,31 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.instrument
 
-import scala.util.Try
+import org.qslib.quantscale._
+import org.qslib.quantscale.Implicits._
+import org.qslib.quantscale.pattern._
 import org.joda.time.DateTime
-import org.qslib.quantscale.pattern.Observable
-import org.qslib.quantscale.pattern.Observer
-import scala.concurrent.Future
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 
-/**
- * Interface for pricing engines.
- *
- * @author Choucri FAHED
- * @since 1.0
- */
-trait PricingEngine extends Observable {
+/** Simple stock class */
+// FIXME solve the Handle riddle
+class Stock(quote: Quote[Money]) extends Instrument with ObservableDefImpl with ObserverDefImpl {
+  override type ResultsType = StockResults
+  override val emptyResults = StockResults()
+  
+  registerWith(quote)
 
-  //protected def validate(argument: A): Try[A]
-
-  def calculate(instrument: Instrument): Future[instrument.ResultsType]
-
-  def update() {
-    notifyObservers()
-  }
+  override def isExpired() = false
+  override def performCalculations() = future { StockResults(quote.value.getOrElse(Money.zero)) }
 }
 
-/** Generic trait for results returned by a pricing engine */
-trait Results {
+case class StockResults(value: Money = Money.zero) extends Results {
+  type ValueType = Money
 
-  /** Either Money or Real */
-  type ValueType
-
-  def value(): ValueType
-  def errorEstimate: Option[ValueType]
-  def valuationDate: DateTime
-  def additionalResults: Map[String, Any]
-
-  /**
-   * @return any additional result returned by the pricing engine.
-   */
-  final def get(tag: String): Option[Any] = additionalResults get tag
+  override val errorEstimate: Option[Money] = Some(Money.zero)
+  override def valuationDate: DateTime = new DateTime()
+  override val additionalResults: Map[String, Any] = Map[String, Any]()
 }

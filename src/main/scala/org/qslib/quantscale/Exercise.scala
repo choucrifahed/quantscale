@@ -66,11 +66,13 @@ case class EuropeanExercise(date: LocalDate) extends Exercise {
 }
 
 /**
- * Early-exercise base class.
+ * Early-exercise base trait.
  *
  * @param payoffAtExpiry The payoff can be at exercise (the default) or at expiry.
  */
-abstract class EarlyExercise(val payoffAtExpiry: Boolean) extends Exercise
+trait EarlyExercise extends Exercise {
+  def payoffAtExpiry: Boolean
+}
 
 /**
  * ==American Exercise==
@@ -79,8 +81,8 @@ abstract class EarlyExercise(val payoffAtExpiry: Boolean) extends Exercise
  * predefined dates; the first date might be omitted, in which
  * case the option can be exercised at any time before the expiry.
  */
-case class AmericanExercise(earliestDate: LocalDate = MinDate, latestDate: LocalDate, override val payoffAtExpiry: Boolean = false)
-  extends EarlyExercise(payoffAtExpiry) {
+case class AmericanExercise(earliestDate: LocalDate = MinDate, latestDate: LocalDate, payoffAtExpiry: Boolean = false)
+  extends EarlyExercise {
   require(earliestDate <= latestDate, "earliestDate > latestDate exercise date")
 
   val allDates = IndexedSeq(earliestDate, latestDate)
@@ -92,7 +94,7 @@ case class AmericanExercise(earliestDate: LocalDate = MinDate, latestDate: Local
  * A Bermudan option can only be exercised at a set of fixed dates.
  */
 // Cannot be defined as a case class because input dates have to be sorted
-class BermudanExercise(inputDates: Seq[LocalDate], override val payoffAtExpiry: Boolean = false) extends EarlyExercise(payoffAtExpiry) with Equals {
+class BermudanExercise(inputDates: Seq[LocalDate], override val payoffAtExpiry: Boolean = false) extends EarlyExercise with Equals {
   require(!inputDates.isEmpty, "no exercise date given")
 
   val allDates = inputDates.sortWith((date1, date2) => date1 <= date2)

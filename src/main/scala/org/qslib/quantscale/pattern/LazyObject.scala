@@ -60,13 +60,30 @@ trait LazyObject extends Observable with Observer {
 
   protected val emptyResults: ResultsType
 
+  def update() = atomic { implicit txn =>
+    // forwards notifications only the first time
+    if (calculated()) {
+      // set to false early
+      // 1) to prevent infinite recursion
+      // 2) otherwise non-lazy observers would be served obsolete
+      //    data because of calculated being still true
+      calculated() = false
+      // observers don't expect notifications from frozen objects
+      if (!frozen()) {
+        notifyObservers()
+        // exiting notifyObservers() calculated could be
+        // already true because of non-lazy observers
+      }
+    }
+  }
+
   /**
    * This method forces the recalculation of any results which would otherwise be cached.
    * Explicit invocation of this method is '''not''' necessary if the object registered
    * itself as observer with the structures on which such results depend.
    * It is strongly advised to follow this policy when possible.
    */
-  def recalculate()(implicit engine: PricingEngine): Future[ResultsType] = atomic { implicit txn =>
+  def recalculate(): Future[ResultsType] = atomic { implicit txn =>
     val wasFrozen = frozen()
     calculated() = false
     frozen() = false
@@ -112,7 +129,7 @@ trait LazyObject extends Observable with Observer {
    * WARNING: Should this method be redefined in derived classes, LazyObject.calculate()
    * should be called in the overriding method.
    */
-  protected def calculate()(implicit engine: PricingEngine): Future[ResultsType] = atomic { implicit txn =>
+  protected def calculate(): Future[ResultsType] = atomic { implicit txn =>
     if (!calculated() && !frozen()) {
       calculated() = true // prevent infinite recursion in case of bootstrapping
       cachedResults() = performCalculations()
@@ -124,22 +141,5 @@ trait LazyObject extends Observable with Observer {
    * This method must implement any calculations which must be
    * (re)done in order to calculate the desired results.
    */
-  protected def performCalculations()(implicit engine: PricingEngine): Future[ResultsType]
-
-  def update() = atomic { implicit txn =>
-    // forwards notifications only the first time
-    if (calculated()) {
-      // set to false early
-      // 1) to prevent infinite recursion
-      // 2) otherwise non-lazy observers would be served obsolete
-      //    data because of calculated being still true
-      calculated() = false
-      // observers don't expect notifications from frozen objects
-      if (!frozen()) {
-        notifyObservers()
-        // exiting notifyObservers() calculated could be
-        // already true because of non-lazy observers
-      }
-    }
-  }
+  protected def performCalculations(): Future[ResultsType]
 }

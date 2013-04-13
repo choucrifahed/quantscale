@@ -42,9 +42,7 @@ package org.qslib.quantscale
 import scala.concurrent._
 import scala.concurrent.stm._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
 import org.qslib.quantscale.pattern.LazyObject
-import org.joda.time.DateTime
 
 /**
  * ==Instrument Trait==
@@ -56,25 +54,13 @@ import org.joda.time.DateTime
  */
 trait Instrument extends LazyObject {
 
-  //  private var _engine: Option[PricingEngine[A]] = None // Might want to use multiple ones, why not make it an implicit parameter
-  //
-  //  def pricingEngine = _engine
-  //
-  //  def pricingEngine_=(pe: PricingEngine[A]) {
-  //    if (None != _engine) unregisterWith(_engine.get)
-  //    _engine = Some(pe)
-  //    registerWith(_engine.get)
-  //    // trigger (lazy) recalculation and notify observers
-  //    update()
-  //  }
-
   /**
    * @return the net present value of the instrument.
    */
-  def NPF()(implicit engine: PricingEngine) = calculate() map (_.value)
-  def errorEstimate()(implicit engine: PricingEngine) = calculate() map (_.errorEstimate)
-  def valuationDate()(implicit engine: PricingEngine) = calculate() map (_.valuationDate)
-  def additionalResults()(implicit engine: PricingEngine) = calculate() map (_.additionalResults)
+  def NPF() = calculate() map (_.value)
+  def errorEstimate() = calculate() map (_.errorEstimate)
+  def valuationDate() = calculate() map (_.valuationDate)
+  def additionalResults() = calculate() map (_.additionalResults)
 
   /**
    * @return whether the instrument might have value greater than zero.
@@ -86,9 +72,9 @@ trait Instrument extends LazyObject {
    * instrument, this method should be overridden to read from
    * it. This is mandatory in case a pricing engine is used.
    */
-  def fetchResults(): Results
+  //def fetchResults(): Results
 
-  override protected def calculate()(implicit engine: PricingEngine) = atomic { implicit txn =>
+  override protected def calculate() = atomic { implicit txn =>
     if (isExpired()) {
       setupExpired()
       calculated() = true
@@ -105,15 +91,4 @@ trait Instrument extends LazyObject {
   protected def setupExpired() {
     cachedResults.single() = future { emptyResults }
   }
-
-  /**
-   * In case a pricing engine is '''not''' used, this
-   * method must be overridden to perform the actual
-   * calculations and set any needed results. In case
-   * a pricing engine is used, the default implementation
-   * can be used.
-   */
-  override protected def performCalculations()(implicit engine: PricingEngine) = engine.calculate(this)
 }
-
-
