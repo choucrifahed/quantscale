@@ -39,7 +39,7 @@ object Implicits {
   // Implicit classes for syntactic sugar
 
   /** Shortcut to declare money amounts such as 50.0 * EUR instead of Money(50.0, EUR) */
-  implicit class DecimalToMoney(val value: Double) extends AnyVal {
+  implicit class DecimalToMoney(val value: Decimal) extends AnyVal {
     def *(currency: Currency)(implicit mcc: MoneyConversionConfig) = Money(value, currency)(mcc)
     def *(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value * money.value, money.currency)(mcc)
     def /(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value / money.value, money.currency)(mcc)

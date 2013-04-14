@@ -112,4 +112,4 @@ final case class Rounding(precision: Int = 2, roundingType: RoundingType = Close
   }
 }
 
-case class Precision(p: Double) extends AnyVal
+case class Precision(p: Decimal) extends AnyVal

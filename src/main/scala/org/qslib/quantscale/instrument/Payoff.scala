@@ -60,7 +60,7 @@ trait FloatingTypePayoff extends TypePayoff {
 /**
  *  Intermediate trait for payoffs based on a fixed strike
  *
- *  @param T type of the strike: could be Money or Real...
+ *  @tparam T type of the strike: could be Money or Real...
  */
 trait StrikedTypePayoff[T] extends TypePayoff {
   def strike(): T
