@@ -22,6 +22,8 @@
 
 package org.qslib.quantscale
 
+import org.qslib.quantscale.currency.ExchangeRateManager
+
 /**
  * Implicit values and classes for syntactic sugar.
  *
@@ -33,7 +35,7 @@ object Implicits {
   // Implicit values
   // TODO Move this to a proper config file
 
-  implicit val defaultMoneyConversionConfig = MoneyConversionConfig(AutomatedConversion, EUR)
+  implicit val defaultMoneyConversionConfig = MoneyConversionConfig(ExchangeRateManager, AutomatedConversion, EUR)
   implicit val defaultPrecision = math.Precision(0.00001)
 
   // Implicit classes for syntactic sugar

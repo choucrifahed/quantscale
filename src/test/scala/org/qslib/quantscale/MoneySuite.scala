@@ -43,13 +43,14 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.qslib.quantscale.currency.ExchangeRateManager
 import org.qslib.quantscale.math.Rounding
-import Implicits.{DecimalToMoney, AlmostEqualDecimal, defaultPrecision}
+import Implicits.{ DecimalToMoney, AlmostEqualDecimal, defaultPrecision }
 
 @RunWith(classOf[JUnitRunner])
 class MoneySuite extends FunSuite {
 
   test("Money arithmetic without conversions test") {
-    implicit val mcc = MoneyConversionConfig(NoConversion, EUR)
+    val erm = new ExchangeRateManager() {}
+    implicit val mcc = MoneyConversionConfig(erm, NoConversion, EUR)
     val m1 = 50000.0 * EUR
     val m2 = 100000.0 * EUR
     val m3 = 500000.0 * EUR
@@ -63,13 +64,13 @@ class MoneySuite extends FunSuite {
   }
 
   test("Money arithmetic with conversion to base currency test") {
-    implicit val mcc = MoneyConversionConfig(BaseCurrencyConversion, EUR)
+    val erm = new ExchangeRateManager() {}
+    implicit val mcc = MoneyConversionConfig(erm, BaseCurrencyConversion, EUR)
 
-    ExchangeRateManager.clear()
     val EURUSD = ExchangeRate(EUR, USD, 1.2042)
     val EURGBP = ExchangeRate(EUR, GBP, 0.6612)
-    ExchangeRateManager add EURUSD
-    ExchangeRateManager add EURGBP
+    erm add EURUSD
+    erm add EURGBP
 
     val m1 = 50000.0 * GBP
     val m2 = 100000.0 * EUR
@@ -87,17 +88,17 @@ class MoneySuite extends FunSuite {
   }
 
   test("Money arithmetic with automated conversion test") {
-    implicit val mcc = MoneyConversionConfig(AutomatedConversion, EUR)
+    val erm = new ExchangeRateManager() {}
+    implicit val mcc = MoneyConversionConfig(erm, AutomatedConversion, EUR)
 
     val m1 = 50000.0 * GBP
     val m2 = 100000.0 * EUR
     val m3 = 500000.0 * USD
 
-    ExchangeRateManager.clear()
     val EURUSD = ExchangeRate(EUR, USD, 1.2042)
     val EURGBP = ExchangeRate(EUR, GBP, 0.6612)
-    ExchangeRateManager add EURUSD
-    ExchangeRateManager add EURGBP
+    erm add EURUSD
+    erm add EURGBP
 
     val calculated = (m1 * 3.0 + 2.5 * m2) - m3 / 5.0
 

@@ -46,15 +46,21 @@ import ExchangeRateType._
 import java.util.concurrent.ConcurrentHashMap
 import scala.util.Failure
 import scala.util.Success
+import scala.collection.SortedSet
 
 /**
  * Exchange-rate repository.
  *
  * @author Choucri FAHED
- * @since 1.0
+ */
+/**
+ * Singleton implementation based on ConcurrentHashMap.
  */
 // FIXME consider using one date instead of 2 for storing a rate which results in a predictable behavior
 trait ExchangeRateManager {
+
+  // Beware this can be a memory leak if the map is never emptied.
+  private val repository = new ConcurrentHashMap[String, Seq[Entry]]
 
   /**
    * Adds an exchange rate. The given rate is valid between the given dates.
@@ -62,7 +68,22 @@ trait ExchangeRateManager {
    * '''Note''': If two rates are given between the same currencies and with overlapping
    * date ranges, the latest one added takes precedence during lookup.
    */
-  def add(rate: ExchangeRate, startDate: LocalDate = MinDate, endDate: LocalDate = MaxDate)
+  def add(rate: ExchangeRate, startDate: LocalDate = MinDate, endDate: LocalDate = MaxDate) {
+    val entry = Entry(rate, startDate, endDate)
+
+    // Seq[Entry] is immutable but not repository this is why a synchronization is necessary
+    repository.synchronized {
+      val oldList = repository.get(entry.key)
+      val newList = if (oldList == null) Seq(entry) else entry +: oldList
+      repository.put(entry.key, newList)
+    }
+  }
+
+  /** Removes all added exchange rates. */
+  def clear() {
+    repository.clear()
+    addKnownRates()
+  }
 
   /**
    * Looks up the exchange rate between two currencies at a given
@@ -76,44 +97,9 @@ trait ExchangeRateManager {
    */
   def lookup(source: Currency,
     target: Currency,
-    date: LocalDate = new LocalDate,
-    erType: ExchangeRateType = Derived): Try[ExchangeRate]
-
-  /**
-   * Removes all added exchange rates.
-   */
-  def clear()
-}
-
-/**
- * Singleton implementation based on ConcurrentHashMap.
- */
-// FIXME singletons don't play well with concurrent test suite execution (SBT)
-object ExchangeRateManager extends ExchangeRateManager {
-
-  // Beware this can be a memory leak if the map is never emptied.
-  private val repository = new ConcurrentHashMap[String, Seq[Entry]]
-
-  def add(rate: ExchangeRate, startDate: LocalDate, endDate: LocalDate) {
-    val entry = Entry(rate, startDate, endDate)
-
-    // Seq[Entry] is immutable but not repository this is why a synchronization is necessary
-    repository.synchronized {
-      val oldList = repository.get(entry.key)
-      val newList = if (oldList == null) Seq(entry) else entry +: oldList
-      repository.put(entry.key, newList)
-    }
-  }
-
-  def clear() {
-    repository.clear()
-    addKnownRates()
-  }
-
-  def lookup(source: Currency,
-    target: Currency,
-    date: LocalDate = new LocalDate,
+    date: LocalDate = LocalDate.today,
     erType: ExchangeRateType = Derived): Try[ExchangeRate] = {
+
     if (source == target) Success(ExchangeRate(source, target, 1.0))
     else if (erType == Direct) directLookup(source, target, date)
     else if (!source.triangulationCurrency.isEmpty) {
@@ -174,13 +160,11 @@ object ExchangeRateManager extends ExchangeRateManager {
   }
 
   private def directLookup(source: Currency, target: Currency, date: LocalDate): Try[ExchangeRate] = {
-    val rates = repository.get(key(source, target))
+    val rates = repository.get(Entry.key(source, target))
     val filteredRates = if (rates != null) rates.filter(_.validAt(date)) else Seq()
     if (filteredRates.isEmpty) Failure(new Exception("No direct conversion available from " + source + " to " + target + " on " + date))
     else Success(filteredRates.head.rate)
   }
-
-  private def key(source: Currency, target: Currency) = scala.collection.SortedSet(source.code, target.code).reduce(_ + _)
 
   private def addKnownRates() {
     // Currencies obsoleted by Euro
@@ -188,9 +172,22 @@ object ExchangeRateManager extends ExchangeRateManager {
   }
 
   private case class Entry(rate: ExchangeRate, startDate: LocalDate = MinDate, endDate: LocalDate = MaxDate) {
-    def key = ExchangeRateManager.key(rate.source, rate.target)
+    def key = Entry.key(rate.source, rate.target)
     def validAt(date: LocalDate) = date >= startDate && date <= endDate
+  }
+
+  private object Entry {
+    def key(source: Currency, target: Currency) = SortedSet(source.code, target.code).reduce(_ + _)
   }
 
   addKnownRates()
 }
+
+/**
+ * Default singleton implementation of the ExchangeRateManager trait.
+ * Avoid using it in unit tests, because despite being thread-safe,
+ * it still has undeterministic behavior when tests run in parallel (default in SBT).
+ *
+ * @see MoneySuite test suite for examples of using ExchangeRateManager in unit tests
+ */
+object ExchangeRateManager extends ExchangeRateManager

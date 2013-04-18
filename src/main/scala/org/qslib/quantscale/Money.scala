@@ -66,7 +66,7 @@ case class Money(value: Decimal = 0.0, currency: Currency)(implicit mcc: MoneyCo
   def convertTo(targetCur: Currency): Try[Money] = {
     if (currency != targetCur) {
       for {
-        rate <- ExchangeRateManager.lookup(currency, targetCur)
+        rate <- mcc.exchangeRateManager.lookup(currency, targetCur)
         result <- rate.exchange(this)(mcc)
       } yield result.rounded
     } else Success(this)
@@ -222,4 +222,5 @@ case object BaseCurrencyConversion extends ConversionType
 /** Return the result in the currency of the first operand. */
 case object AutomatedConversion extends ConversionType
 
-case class MoneyConversionConfig(conversionType: ConversionType, baseCurrency: Currency)
+/** This class holds all the needed configuration to convert money from one currency to another. */
+case class MoneyConversionConfig(exchangeRateManager: ExchangeRateManager, conversionType: ConversionType, baseCurrency: Currency)
