@@ -53,15 +53,6 @@ import org.joda.time.Days
 trait DayCounter {
 
   /**
-   * @return the name of the day counter.
-   * @note This method is used for output and comparison between day counters.
-   * It is '''not''' meant to be used for writing switch-on-type code.
-   */
-  // TODO check if this is necessary with case classes
-  // equals() / hashCode() should be based on this field as well as toString()
-  def name(): String
-
-  /**
    * Might be overloaded by more complex day counters.
    * @return the number of days between two dates.
    */
@@ -73,4 +64,31 @@ trait DayCounter {
     endDate: LocalDate,
     refPeriodStart: LocalDate = LocalDate.today,
     refPeriodEnd: LocalDate = LocalDate.today): Time
+}
+
+/** Actual/360 day count convention, also known as "Act/360", or "A/360". */
+case object Actual360 extends DayCounter {
+  override def toString() = "Actual/360"
+
+  override def yearFraction(startDate: LocalDate, endDate: LocalDate,
+    refPeriodStart: LocalDate, refPeriodEnd: LocalDate): Time =
+    dayCount(startDate, endDate) / 360.0
+}
+
+/**
+ * "Actual/365 (Fixed)" day count convention, also know as
+ * "Act/365 (Fixed)", "A/365 (Fixed)", or "A/365F".
+ *
+ * @note According to ISDA, "Actual/365" (without "Fixed") is
+ * an alias for "Actual/Actual (ISDA)" (see ActualActual.)
+ * If Actual/365 is not explicitly specified as fixed in an
+ * instrument specification, you might want to double-check
+ * its meaning.
+ */
+case object Actual365Fixed extends DayCounter {
+  override def toString() = "Actual/360"
+
+  override def yearFraction(startDate: LocalDate, endDate: LocalDate,
+    refPeriodStart: LocalDate, refPeriodEnd: LocalDate): Time =
+    dayCount(startDate, endDate) / 365.0
 }
