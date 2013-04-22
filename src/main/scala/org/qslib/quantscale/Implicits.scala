@@ -49,7 +49,7 @@ object Implicits {
 
   /** Shortcut to tell if 2 decimals are close enough given a precision */
   implicit class AlmostEqualDecimal(val d: Decimal) extends AnyVal {
-    def ~=(d2: Decimal)(implicit p: math.Precision) = {
+    def ~=(d2: Decimal)(implicit p: math.Precision): Boolean = {
       val diff = (d - d2).abs
       (diff == 0.0) || (if (d == 0.0) diff / d2 <= p.p else diff / d <= p.p)
     }

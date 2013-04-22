@@ -52,7 +52,11 @@ package object quantscale {
 
   // Brief Custom types
 
+  /** Positive integer number. */
+  type Natural = Int
+
   /** Real number. */
+  // TODO consider using Spire numerics (Saddle integration issue!)
   type Real = Double
 
   /** Decimal number. */
