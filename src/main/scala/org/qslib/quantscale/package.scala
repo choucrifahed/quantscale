@@ -90,13 +90,18 @@ package object quantscale {
   type TimeSeries[T] = Series[LocalDate, T]
 
   /** Base type for option payoffs. */
-  type Payoff = Function1[Money, Money]
+  type Payoff = Money => Money
 
   /** Information about a default-protection contract */
   // comes from default.hpp
   sealed trait Side
   case object Buyer extends Side
   case object Seller extends Side
+
+  // comes from position.hpp
+  sealed trait Position
+  case object Long extends Position
+  case object Short extends Position
 
   val MinDate = new LocalDate(0, 1, 1)
   val MaxDate = new LocalDate(9999, 12, 31)

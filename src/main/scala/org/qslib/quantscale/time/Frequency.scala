@@ -47,20 +47,20 @@ package org.qslib.quantscale.time
  * @author Choucri FAHED
  * @since 1.0
  */
-object Frequency extends Enumeration {
-  type Frequency = Value
-
-  val NoFrequency = Value(-1)
-  val Once = Value(0)
-  val Annual = Value(1)
-  val Semiannual = Value(2)
-  val EveryFourthMonth = Value(3)
-  val Quarterly = Value(4)
-  val Bimonthly = Value(6)
-  val Monthly = Value(12)
-  val EveryFourthWeek = Value(13)
-  val Biweekly = Value(26)
-  val Weekly = Value(52)
-  val Daily = Value(365)
-  val OtherFrequency = Value(999)
+sealed trait Frequency {
+  def apply(): Int
 }
+
+case object NoFrequency extends Frequency { override val apply = -1 }
+case object Once extends Frequency { override val apply = 0 }
+case object Annual extends Frequency { override val apply = 1 }
+case object Semiannual extends Frequency { override val apply = 2 }
+case object EveryFourthMonth extends Frequency { override val apply = 3 }
+case object Quarterly extends Frequency { override val apply = 4 }
+case object Bimonthly extends Frequency { override val apply = 6 }
+case object Monthly extends Frequency { override val apply = 12 }
+case object EveryFourthWeek extends Frequency { override val apply = 13 }
+case object Biweekly extends Frequency { override val apply = 26 }
+case object Weekly extends Frequency { override val apply = 52 }
+case object Daily extends Frequency { override val apply = 365 }
+case object OtherFrequency extends Frequency { override val apply = 999 }
