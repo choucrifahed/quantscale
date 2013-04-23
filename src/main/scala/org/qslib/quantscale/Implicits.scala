@@ -38,6 +38,9 @@ object Implicits {
   implicit val defaultMoneyConversionConfig = MoneyConversionConfig(ExchangeRateManager, AutomatedConversion, EUR)
   implicit val defaultPrecision = math.Precision(0.00001)
 
+  /** Time interval used in finite differences. */
+  implicit val dt = 0.0001
+
   // Implicit classes for syntactic sugar
 
   /** Shortcut to declare money amounts such as 50.0 * EUR instead of Money(50.0, EUR) */

@@ -50,4 +50,6 @@ trait Quote[T] extends Observable {
 
   /** @return the current value */
   def value(): Option[T]
+
+  def apply(): T = value().get
 }
