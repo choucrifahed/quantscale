@@ -157,7 +157,8 @@ object InterestRate {
    * The resulting InterestRate has the day-counter provided as input.
    * @note Time must be measured using the day-counter provided as input.
    */
-  def impliedRate(compound: Real, resultDC: DayCounter,
+  def impliedRate(compound: Real,
+    resultDC: DayCounter,
     comp: Compounding,
     freq: Frequency,
     t: Time): InterestRate = {
@@ -186,7 +187,8 @@ object InterestRate {
    * @return implied rate for a given compound factor between two dates.
    * The resulting rate is calculated taking the required day-counting rule into account.
    */
-  def impliedRate(compound: Real, resultDC: DayCounter,
+  def impliedRate(compound: Real,
+    resultDC: DayCounter,
     comp: Compounding,
     freq: Frequency,
     startDate: LocalDate,
