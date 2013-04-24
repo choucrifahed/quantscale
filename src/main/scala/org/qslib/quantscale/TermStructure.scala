@@ -63,7 +63,7 @@ trait TermStructure extends Extrapolator {
 
   /** Converts a date into time */
   @inline
-  def timeFromReference(date: LocalDate)(implicit evaluationDate: LocalDate): Time =
+  def timeFromReference(date: LocalDate): Time =
     dayCounter().yearFraction(referenceDate(), date)
 
   /** @return the latest date for which the curve can return values. */
@@ -71,11 +71,13 @@ trait TermStructure extends Extrapolator {
 
   /** @return the latest time for which the curve can return values. */
   @inline
-  def maxTime()(implicit evaluationDate: LocalDate): Time = timeFromReference(maxDate())
+  def maxTime(): Time = timeFromReference(maxDate())
 
   /** @return the date at which discount = 1.0 and/or variance = 0.0. */
-  def referenceDate()(implicit evaluationDate: LocalDate): LocalDate = calendar().advance(
-    evaluationDate, settlementDays(), time.TUDays)
+  def referenceDate(): LocalDate = {
+    val today = Settings.evaluationDate()
+    calendar().advance(today, settlementDays(), time.TUDays)
+  }
 
   /** @return the calendar used for reference and/or option date calculation. */
   def calendar(): Calendar
@@ -84,10 +86,10 @@ trait TermStructure extends Extrapolator {
   def settlementDays(): Natural
 
   /** Date-range check. */
-  protected final def checkRange(date: LocalDate, extrapolate: Boolean)(implicit evaluationDate: LocalDate): Boolean =
+  protected final def checkRange(date: LocalDate, extrapolate: Boolean): Boolean =
     referenceDate() <= date && (extrapolate || allowExtrapolation() || date <= maxDate())
 
   /** Time-range check */
-  protected final def checkRange(time: Time, extrapolate: Boolean)(implicit evaluationDate: LocalDate): Boolean =
+  protected final def checkRange(time: Time, extrapolate: Boolean): Boolean =
     0.0 <= time && (extrapolate || allowExtrapolation() || time <= maxTime() || (time ~= maxTime()))
 }

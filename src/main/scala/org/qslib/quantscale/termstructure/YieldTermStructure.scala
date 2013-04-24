@@ -63,26 +63,26 @@ trait YieldTermStructure extends TermStructure {
   def jumpDates: Seq[LocalDate]
 
   // TODO keep in mind for implementing classes
-  final def defaultJumpDates()(implicit evaluationDate: LocalDate): Seq[LocalDate] = {
+  final def defaultJumpDates(): Seq[LocalDate] = {
     val baseYear = referenceDate().year().get()
     (0 to jumps.size) map (year => new LocalDate(year + baseYear, 12, 31))
   }
 
-  final def jumpTimes(implicit evaluationDate: LocalDate): Seq[Time] = jumpDates map (timeFromReference(_))
+  final def jumpTimes(): Seq[Time] = jumpDates map (timeFromReference(_))
 
   /**
    * Time is calculated as a fraction of year from the reference date.
    * @return The discount factor from a given date to the reference date.
    */
   @inline
-  final def discountDate(date: LocalDate, extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): DiscountFactor =
+  final def discountDate(date: LocalDate, extrapolate: Boolean = false): DiscountFactor =
     discount(timeFromReference(date), extrapolate)
 
   /** @return The discount factor from a given time to the reference date. */
-  final def discount(t: Time, extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): DiscountFactor = {
+  final def discount(t: Time, extrapolate: Boolean = false): DiscountFactor = {
     def loop(i: Int, jumpEffect: Real): Real = {
       val jumpTime = jumpTimes.apply(i)
-      if (jumpTime > 0 && jumpTime < t) loop(i + 1, jumpEffect * jumps(i)())
+      if (jumpTime > 0 && jumpTime < t) loop(i + 1, jumpEffect * jumps(i)().getOrElse(0.0))
       else jumpEffect
     }
 
@@ -105,7 +105,7 @@ trait YieldTermStructure extends TermStructure {
     resultDayCounter: DayCounter,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): InterestRate = {
+    extrapolate: Boolean = false): InterestRate = {
     if (date == referenceDate()) {
       val compound = 1.0 / discount(dt, extrapolate)
       // t has been calculated with a possibly different day counter
@@ -126,7 +126,7 @@ trait YieldTermStructure extends TermStructure {
   final def zeroRateTime(t: Time,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): InterestRate = {
+    extrapolate: Boolean = false): InterestRate = {
 
     val time = if (t == 0.0) dt else t
     val compound = 1.0 / discount(time, extrapolate)
@@ -144,7 +144,7 @@ trait YieldTermStructure extends TermStructure {
     resultDayCounter: DayCounter,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): InterestRate = {
+    extrapolate: Boolean = false): InterestRate = {
     if (startDate == endDate) {
       checkRange(startDate, extrapolate)
       val t1 = (timeFromReference(startDate) - dt / 2.0) max 0.0
@@ -174,7 +174,7 @@ trait YieldTermStructure extends TermStructure {
     resultDayCounter: DayCounter,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): InterestRate =
+    extrapolate: Boolean = false): InterestRate =
     forwardRateDate(date, date + period, resultDayCounter, compounding, frequency, extrapolate)
 
   /**
@@ -187,7 +187,7 @@ trait YieldTermStructure extends TermStructure {
     endTime: Time,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false)(implicit evaluationDate: LocalDate): InterestRate = {
+    extrapolate: Boolean = false): InterestRate = {
 
     val (diff, compound) = if (startTime == endTime) {
       checkRange(startTime, extrapolate)

@@ -54,7 +54,7 @@ class Stock(quote: Quote[Money]) extends Instrument with ObservableDefImpl with 
   registerWith(quote)
 
   override def isExpired() = false
-  override def performCalculations() = future { StockResults(quote.value.getOrElse(Money.zero)) }
+  override def performCalculations() = future { StockResults(quote().getOrElse(Money.zero)) }
 }
 
 case class StockResults(value: Money = Money.zero) extends Results {

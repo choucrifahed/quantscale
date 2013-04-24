@@ -61,7 +61,8 @@ trait Event extends Observable with Ordered[Event] {
    * the event date is the same as the refDate.
    * @return true if an event has already occurred before a date
    */
-  final def hasOccurred(refDate: LocalDate = LocalDate.now, includeRefDate: Boolean = false): Boolean =
+  final def hasOccurred(refDate: LocalDate = Settings.evaluationDate(),
+    includeRefDate: Boolean = Settings.includeReferenceDateEvents()): Boolean =
     if (includeRefDate) date < refDate else date <= refDate
 
   @inline final def compare(that: Event): Int = date compare that.date

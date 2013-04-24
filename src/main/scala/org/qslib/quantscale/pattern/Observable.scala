@@ -41,6 +41,7 @@
 package org.qslib.quantscale.pattern
 
 import java.util.concurrent.CopyOnWriteArraySet
+import scala.concurrent.stm._
 
 /**
  * Object that notifies its changes to a set of observers.
@@ -95,4 +96,37 @@ trait ObserverDefImpl extends Observer {
     observables.toArray.toList.asInstanceOf[List[Observable]].foreach(o => o unregisterObserver this)
     observables.clear()
   }
+}
+
+/**
+ * Observable and assignable thread-safe proxy to concrete value.
+ * 
+ * Observers can be registered with instances of this trait so that 
+ * they are notified when a different value is assigned to such instances.
+ * Client code can copy the contained value or pass it to functions.
+ */
+trait ObservableValue[T] extends Observable {
+  // FIXME consider moving to Agents or ScalaRX
+  private[this] val valueRef: Ref[T] = Ref(initialValue)
+
+  /** @return None by default, but do not hesitate to override it! */
+  def initialValue(): T
+
+  def apply() = valueRef.single()
+
+  /**
+   * @return The old value.
+   * @note This method will notify observers of the value change if applicable.
+   */
+  def update(newValue: T): T = atomic { implicit txn =>
+    val oldValue = valueRef()
+    if (oldValue != newValue) {
+      valueRef() = newValue
+      notifyObservers()
+    }
+    oldValue
+  }
+
+  /** This method resets to the initial value '''without''' notifying observers. */
+  def reset() { valueRef.single() = initialValue() }
 }

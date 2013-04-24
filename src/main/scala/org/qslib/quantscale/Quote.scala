@@ -40,6 +40,8 @@
 package org.qslib.quantscale
 
 import org.qslib.quantscale.pattern.Observable
+import org.qslib.quantscale.pattern.ObservableValue
+import org.qslib.quantscale.pattern.ObservableDefImpl
 
 /**
  * Base trait for market observables.
@@ -49,7 +51,9 @@ import org.qslib.quantscale.pattern.Observable
 trait Quote[T] extends Observable {
 
   /** @return the current value */
-  def value(): Option[T]
-
-  def apply(): T = value().get
+  def apply(): Option[T]
 }
+
+/** Market element returning a stored value. */
+class SimpleQuote(override val initialValue: Option[Real] = None) extends Quote[Real]
+  with ObservableValue[Option[Real]] with ObservableDefImpl
