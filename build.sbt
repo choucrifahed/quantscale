@@ -16,7 +16,7 @@ scalacOptions <++= scalaVersion map { v =>
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.1.2",
   "com.typesafe.akka" %% "akka-agent" % "2.1.2",
-  "org.scala-saddle" %% "saddle" % "1.0.5",
+  "org.scala-saddle" %% "saddle" % "1.1.0",
   "org.scalaj" % "scalaj-time_2.9.2" % "0.6",
   "org.scalatest" %% "scalatest" % "1.9.1" % "test",
   "org.scalacheck" %% "scalacheck" % "1.10.1" % "test",
