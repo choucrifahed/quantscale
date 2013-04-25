@@ -54,6 +54,7 @@ import org.scala_tools.time.Imports._
  * This trait defines the interface of concrete interest rate structures.
  */
 trait YieldTermStructure extends TermStructure {
+  refDate: ReferenceDate =>
 
   require(jumps.size == jumpDates.size, "Mismatch between number of jumps (" + jumps.size +
     ") and jump dates (" + jumpDates.size + ").")

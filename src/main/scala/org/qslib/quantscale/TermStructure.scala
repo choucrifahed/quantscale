@@ -57,27 +57,23 @@ import org.qslib.quantscale.Implicits._
  * some other structure.
  */
 trait TermStructure extends Extrapolator {
+  refDate: ReferenceDate =>
 
   /** @return the day counter used for date/time conversion. */
   def dayCounter(): DayCounter
 
   /** Converts a date into time */
-  @inline
-  def timeFromReference(date: LocalDate): Time =
+  @inline final def timeFromReference(date: LocalDate): Time =
     dayCounter().yearFraction(referenceDate(), date)
 
   /** @return the latest date for which the curve can return values. */
   def maxDate(): LocalDate
 
   /** @return the latest time for which the curve can return values. */
-  @inline
-  def maxTime(): Time = timeFromReference(maxDate())
+  @inline final def maxTime(): Time = timeFromReference(maxDate())
 
   /** @return the date at which discount = 1.0 and/or variance = 0.0. */
-  def referenceDate(): LocalDate = {
-    val today = Settings.evaluationDate()
-    calendar().advance(today, settlementDays(), time.TUDays)
-  }
+  def referenceDate(): LocalDate = refDate()
 
   /** @return the calendar used for reference and/or option date calculation. */
   def calendar(): Calendar
@@ -92,4 +88,21 @@ trait TermStructure extends Extrapolator {
   /** Time-range check */
   protected final def checkRange(time: Time, extrapolate: Boolean): Boolean =
     0.0 <= time && (extrapolate || allowExtrapolation() || time <= maxTime() || (time ~= maxTime()))
+}
+
+sealed trait ReferenceDate {
+  def apply(): LocalDate
+}
+
+class FixedReferenceDate(date: LocalDate) extends ReferenceDate {
+  override def apply() = date
+}
+
+class MovingReferenceDate(settlementDays: Natural) extends ReferenceDate {
+  termStructure: TermStructure =>
+
+  override def apply() = {
+    val today = Settings.evaluationDate()
+    termStructure.calendar.advance(today, settlementDays, time.TUDays)
+  }
 }

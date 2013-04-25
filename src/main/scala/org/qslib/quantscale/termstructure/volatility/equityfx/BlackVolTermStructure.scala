@@ -20,7 +20,8 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2002, 2003 Ferdinando Ametrano
+ Copyright (C) 2003, 2004, 2005, 2006 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -36,31 +37,12 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale.instrument
+package org.qslib.quantscale.termstructure.volatility.equityfx
 
+import org.qslib.quantscale.termstructure.VolatilityTermStructure
 import org.qslib.quantscale._
-import org.qslib.quantscale.Implicits._
-import org.qslib.quantscale.pattern._
-import org.scala_tools.time.Imports._
-import scala.concurrent._
-import ExecutionContext.Implicits.global
 
-/** Simple stock class */
-// FIXME solve the Handle riddle
-class Stock(quote: Quote[Money]) extends Instrument with ObservableDefImpl with ObserverDefImpl {
-  override type ResultsType = StockResults
-  override val emptyResults = StockResults()
-  
-  registerWith(quote)
+trait BlackVolTermStructure extends VolatilityTermStructure {
+  refDate: ReferenceDate =>
 
-  override def isExpired() = false
-  override def performCalculations() = future { StockResults(quote().getOrElse(Money.zero)) }
-}
-
-case class StockResults(value: Money = Money.zero) extends Results {
-  type ValueType = Money
-
-  override val errorEstimate: Option[Money] = Some(Money.zero)
-  override def valuationDate: DateTime = DateTime.now
-  override val additionalResults: Map[String, Any] = Map[String, Any]()
 }
