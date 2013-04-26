@@ -56,8 +56,9 @@ import scala.util.Failure
 trait BlackVolTermStructure extends VolatilityTermStructure {
   refDate: ReferenceDate =>
 
-  val dT: Time = 1.0 / 365.0
+  // val dT: Time = 1.0 / 365.0
 
+  // TODO check if this cannot be moved up in the hierarchy
   override val businessDayConvention = Following
 
   /** @return spot volatility */
@@ -69,7 +70,7 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
     blackVol(timeFromReference(maturity), strike, extrapolate)
 
   /** @return spot volatility */
-  final def blackVol(maturity: => Time, strike: Real, extrapolate: Boolean = false): Try[Volatility] =
+  final def blackVol(maturity: Time, strike: Real, extrapolate: Boolean = false): Try[Volatility] =
     Try {
       checkRange(maturity, extrapolate)
       checkStrike(strike, extrapolate)
@@ -85,7 +86,7 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
     blackVariance(timeFromReference(maturity), strike, extrapolate)
 
   /** @return spot variance */
-  final def blackVariance(maturity: => Time, strike: Real, extrapolate: Boolean = false): Try[Real] =
+  final def blackVariance(maturity: Time, strike: Real, extrapolate: Boolean = false): Try[Real] =
     Try {
       checkRange(maturity, extrapolate)
       checkStrike(strike, extrapolate)
