@@ -35,8 +35,9 @@ object Implicits {
   // Implicit values
   // TODO Move this to a proper config file
 
+  implicit val epsilon = 1.0e-5
+  implicit val defaultPrecision = math.Precision(epsilon)
   implicit val defaultMoneyConversionConfig = MoneyConversionConfig(ExchangeRateManager, AutomatedConversion, EUR)
-  implicit val defaultPrecision = math.Precision(0.00001)
 
   /** Time interval used in finite differences. */
   implicit val dt = 0.0001

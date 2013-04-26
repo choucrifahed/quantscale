@@ -45,6 +45,8 @@ import org.qslib.quantscale.time.DayCounter
 import org.qslib.quantscale.time.Calendar
 import org.scala_tools.time.Imports._
 import org.qslib.quantscale.Implicits._
+import scala.util.Try
+import scala.util.Success
 
 /**
  * Basic term-structure functionality.
@@ -82,12 +84,18 @@ trait TermStructure extends Extrapolator {
   def settlementDays(): Natural
 
   /** Date-range check. */
-  protected final def checkRange(date: LocalDate, extrapolate: Boolean): Boolean =
-    referenceDate() <= date && (extrapolate || allowExtrapolation() || date <= maxDate())
+  protected final def checkRange(date: LocalDate, extrapolate: Boolean) {
+    require(referenceDate() <= date, "date ($date) before reference date (${referenceDate()})")
+    require(extrapolate || allowExtrapolation() || date <= maxDate(),
+      "date ($date) is past max curve date (${maxDate()})")
+  }
 
   /** Time-range check */
-  protected final def checkRange(time: Time, extrapolate: Boolean): Boolean =
-    0.0 <= time && (extrapolate || allowExtrapolation() || time <= maxTime() || (time ~= maxTime()))
+  protected final def checkRange(t: Time, extrapolate: Boolean) {
+    require(0.0 <= t, "negative time ($t) given")
+    require(extrapolate || allowExtrapolation() || t <= maxTime() || (t ~= maxTime()),
+      "time ($t) is past max curve time (${maxTime()})")
+  }
 }
 
 sealed trait ReferenceDate {
