@@ -101,7 +101,7 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
   final def blackForwardVol(startDate: LocalDate, endDate: LocalDate, strike: Real,
     extrapolate: Boolean): Try[Volatility] = Try {
     // (redundant) date-based checks
-    require(startDate <= endDate, "$startDate later than $endDate")
+    require(startDate <= endDate, s"$startDate later than $endDate")
     checkRange(endDate, extrapolate)
 
     // using the time implementation
@@ -113,7 +113,7 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
   /** @return forward (at-the-money) volatility */
   final def blackForwardVol(t1: Time, t2: Time, strike: Real, extrapolate: Boolean = false): Try[Volatility] =
     Try {
-      require(t1 <= t2, "$t1 later than t2")
+      require(t1 <= t2, s"$t1 later than $t2")
       checkRange(t2, extrapolate)
       checkStrike(strike, extrapolate)
 
@@ -143,7 +143,7 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
   final def blackForwardVariance(startDate: LocalDate, endDate: LocalDate, strike: Real,
     extrapolate: Boolean): Try[Real] = Try {
     // (redundant) date-based checks
-    require(startDate <= endDate, "$startDate later than $endDate")
+    require(startDate <= endDate, s"$startDate later than $endDate")
     checkRange(endDate, extrapolate)
 
     // using the time implementation
@@ -155,7 +155,7 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
   /** @return forward (at-the-money) variance */
   final def blackForwardVariance(t1: Time, t2: Time, strike: Real, extrapolate: Boolean = false): Try[Real] =
     Try {
-      require(t1 <= t2, "$t1 later than $t2")
+      require(t1 <= t2, s"$t1 later than $t2")
       checkRange(t2, extrapolate)
       checkStrike(strike, extrapolate);
       val v1 = blackVarianceImpl(t1, strike).get

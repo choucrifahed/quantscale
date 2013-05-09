@@ -23,6 +23,8 @@
 package org.qslib.quantscale
 
 import org.qslib.quantscale.currency.ExchangeRateManager
+import org.saddle.Vec
+import scala.reflect.ClassTag
 
 /**
  * Implicit values and classes for syntactic sugar.
@@ -56,6 +58,44 @@ object Implicits {
     def ~=(d2: Decimal)(implicit p: math.Precision): Boolean = {
       val diff = (d - d2).abs
       (diff == 0.0) || (if (d == 0.0) diff / d2 <= p.p else diff / d <= p.p)
+    }
+  }
+
+  implicit class RichVec[T: Ordering: ClassTag](val vec: Vec[T]) {
+
+    /** @return true if for every 2 consecutive elements x1 and x2, x1 < x2 */
+    def isStrictlyAscending() = isSorted((x1, x2) => implicitly[Ordering[T]].lt(x1, x2))
+
+    /** @return true if for every 2 consecutive elements x1 and x2, x1 <= x2 */
+    def isAscending() = isSorted((x1, x2) => implicitly[Ordering[T]].lteq(x1, x2))
+
+    /** @return true if for every 2 consecutive elements x1 and x2, x1 > x2 */
+    def isStrictlyDescending() = isSorted((x1, x2) => implicitly[Ordering[T]].gt(x1, x2))
+
+    /** @return true if for every 2 consecutive elements x1 and x2, x1 >= x2 */
+    def isDescending() = isSorted((x1, x2) => implicitly[Ordering[T]].gteq(x1, x2))
+
+    private def isSorted(order: (T, T) => Boolean): Boolean =
+      vec.zipMap(vec.tail(vec.length - 1))(order).foldLeft(true)((b1, b2) => b1 && b2)
+
+    def upperBound(from: Int, to: Int, x: T): Int = {
+      require(from >= 0 && from <= to && to <= vec.length)
+
+      def loop(len: Int, from: Int): Int = {
+        if (len == 0) from
+        else {
+          val half = len >> 1
+          val middle = from + half
+          if (implicitly[Ordering[T]].lt(x, vec raw middle)) {
+            loop(half, from)
+          } else {
+            loop(len - (half + 1), middle + 1)
+          }
+        }
+      }
+
+      val len = to - from
+      loop(len, from)
     }
   }
 }

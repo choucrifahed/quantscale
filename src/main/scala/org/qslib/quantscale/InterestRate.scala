@@ -69,7 +69,7 @@ case class InterestRate(rate: Rate, dayCounter: DayCounter, compounding: Compoun
   // Check that compounding is coherent with the frequency
   compounding match {
     case Compounded | SimpleThenCompounded => require(frequency != Once && frequency != NoFrequency,
-      "Frequency ($frequency) not allowed with compounding ($compounding) for interest rates.")
+      s"Frequency ($frequency) not allowed with compounding ($compounding) for interest rates.")
     case _ => // Do nothing
   }
 
@@ -86,7 +86,7 @@ case class InterestRate(rate: Rate, dayCounter: DayCounter, compounding: Compoun
     endDate: LocalDate,
     refStart: LocalDate = LocalDate.now,
     refEnd: LocalDate = LocalDate.now): DiscountFactor = {
-    require(startDate <= endDate, "startDate ($startDate) later than endDate ($endDate)")
+    require(startDate <= endDate, s"startDate ($startDate) later than endDate ($endDate)")
     val t = dayCounter.yearFraction(startDate, endDate, refStart, refEnd)
     discountFactor(t)
   }
@@ -115,7 +115,7 @@ case class InterestRate(rate: Rate, dayCounter: DayCounter, compounding: Compoun
     endDate: LocalDate,
     refStart: LocalDate = LocalDate.now,
     refEnd: LocalDate = LocalDate.now): Real = {
-    require(startDate <= endDate, "startDate ($startDate) later than endDate ($endDate)")
+    require(startDate <= endDate, s"startDate ($startDate) later than endDate ($endDate)")
     val t = dayCounter.yearFraction(startDate, endDate, refStart, refEnd)
     compoundFactor(t)
   }
@@ -143,7 +143,7 @@ case class InterestRate(rate: Rate, dayCounter: DayCounter, compounding: Compoun
     endDate: LocalDate,
     refStart: LocalDate = LocalDate.now,
     refEnd: LocalDate = LocalDate.now): InterestRate = {
-    require(startDate <= endDate, "startDate ($startDate) later than endDate ($endDate)")
+    require(startDate <= endDate, s"startDate ($startDate) later than endDate ($endDate)")
     val t1 = dayCounter.yearFraction(startDate, endDate, refStart, refEnd)
     val t2 = resultDC.yearFraction(startDate, endDate, refStart, refEnd)
     InterestRate.impliedRate(compoundFactor(t1), resultDC, comp, freq, t2)
@@ -163,13 +163,13 @@ object InterestRate {
     freq: Frequency,
     t: Time): InterestRate = {
 
-    require(compound > 0.0, "Positive compound ($compound) factor required.")
+    require(compound > 0.0, s"Positive compound ($compound) factor required.")
 
     val r = if (compound == 1.0) {
-      require(t >= 0.0, "non negative time ($t) required")
+      require(t >= 0.0, s"non negative time ($t) required")
       0.0
     } else {
-      require(t > 0.0, "positive time ($t) required")
+      require(t > 0.0, s"positive time ($t) required")
       comp match {
         case Simple => (compound - 1.0) / t
         case Compounded => (Math.pow(compound, 1.0 / (freq() * t)) - 1.0) * freq()
@@ -195,7 +195,7 @@ object InterestRate {
     endDate: LocalDate,
     refStart: LocalDate = LocalDate.now,
     refEnd: LocalDate = LocalDate.now): InterestRate = {
-    require(startDate <= endDate, "startDate ($startDate) later than endDate ($endDate)")
+    require(startDate <= endDate, s"startDate ($startDate) later than endDate ($endDate)")
     val t = resultDC.yearFraction(startDate, endDate, refStart, refEnd)
     impliedRate(compound, resultDC, comp, freq, t)
   }

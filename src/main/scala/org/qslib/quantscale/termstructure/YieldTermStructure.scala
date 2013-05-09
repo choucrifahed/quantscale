@@ -155,7 +155,7 @@ trait YieldTermStructure extends TermStructure {
       // but the difference should not matter for very small times
       InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, dt)
     } else {
-      require(startDate < endDate, "$startDate later than $endDate")
+      require(startDate < endDate, s"$startDate later than $endDate")
       val compound = discountDate(startDate, extrapolate) / discountDate(endDate, extrapolate)
       InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, startDate, endDate)
     }
@@ -196,7 +196,7 @@ trait YieldTermStructure extends TermStructure {
       val t2 = t1 + dt
       (dt, discount(t1, true) / discount(t2, true))
     } else {
-      require(startTime < endTime, "endTime ($endTime) < t1 ($startTime)")
+      require(startTime < endTime, s"endTime ($endTime) < t1 ($startTime)")
       (endTime - startTime, discount(startTime, extrapolate) / discount(endTime, extrapolate))
     }
 

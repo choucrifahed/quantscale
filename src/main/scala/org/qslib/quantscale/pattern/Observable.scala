@@ -100,8 +100,8 @@ trait ObserverDefImpl extends Observer {
 
 /**
  * Observable and assignable thread-safe proxy to concrete value.
- * 
- * Observers can be registered with instances of this trait so that 
+ *
+ * Observers can be registered with instances of this trait so that
  * they are notified when a different value is assigned to such instances.
  * Client code can copy the contained value or pass it to functions.
  */
@@ -129,4 +129,6 @@ trait ObservableValue[T] extends Observable {
 
   /** This method resets to the initial value '''without''' notifying observers. */
   def reset() { valueRef.single() = initialValue() }
+
+  override def toString() = s"ObservableValue(now = ${valueRef.single()})"
 }

@@ -52,8 +52,11 @@ trait Quote[T] extends Observable {
 
   /** @return the current value */
   def apply(): Option[T]
+
+  override def toString() = s"Quote(${apply()})"
 }
 
 /** Market element returning a stored value. */
+// FIXME toString() needs to tested
 class SimpleQuote(override val initialValue: Option[Real] = None) extends Quote[Real]
   with ObservableValue[Option[Real]] with ObservableDefImpl

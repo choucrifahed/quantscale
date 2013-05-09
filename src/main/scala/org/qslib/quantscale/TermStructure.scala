@@ -38,9 +38,6 @@
 
 package org.qslib.quantscale
 
-import org.qslib.quantscale.pattern.Observable
-import org.qslib.quantscale.pattern.Observer
-import org.qslib.quantscale.math.interpolation.Extrapolator
 import org.qslib.quantscale.time.DayCounter
 import org.qslib.quantscale.time.Calendar
 import org.scala_tools.time.Imports._
@@ -58,7 +55,7 @@ import scala.util.Success
  * the third is that it is based on the reference date of
  * some other structure.
  */
-trait TermStructure extends Extrapolator {
+trait TermStructure {
   refDate: ReferenceDate =>
 
   /** @return the day counter used for date/time conversion. */
@@ -80,21 +77,18 @@ trait TermStructure extends Extrapolator {
   /** @return the calendar used for reference and/or option date calculation. */
   def calendar(): Calendar
 
-  /** @return the settlementDays used for reference date calculation */
-  def settlementDays(): Natural
-
   /** Date-range check. */
   protected final def checkRange(date: LocalDate, extrapolate: Boolean) {
-    require(referenceDate() <= date, "date ($date) before reference date (${referenceDate()})")
-    require(extrapolate || allowExtrapolation() || date <= maxDate(),
-      "date ($date) is past max curve date (${maxDate()})")
+    require(referenceDate() <= date, s"date ($date) before reference date (${referenceDate()})")
+    require(extrapolate || date <= maxDate(),
+      s"date ($date) is past max curve date (${maxDate()})")
   }
 
   /** Time-range check */
   protected final def checkRange(t: Time, extrapolate: Boolean) {
-    require(0.0 <= t, "negative time ($t) given")
-    require(extrapolate || allowExtrapolation() || t <= maxTime() || (t ~= maxTime()),
-      "time ($t) is past max curve time (${maxTime()})")
+    require(0.0 <= t, s"negative time ($t) given")
+    require(extrapolate || t <= maxTime() || (t ~= maxTime()),
+      s"time ($t) is past max curve time (${maxTime()})")
   }
 }
 
@@ -106,7 +100,7 @@ class FixedReferenceDate(date: LocalDate) extends ReferenceDate {
   override def apply() = date
 }
 
-class MovingReferenceDate(settlementDays: Natural) extends ReferenceDate {
+class MovingReferenceDate(val settlementDays: Natural) extends ReferenceDate {
   termStructure: TermStructure =>
 
   override def apply() = {

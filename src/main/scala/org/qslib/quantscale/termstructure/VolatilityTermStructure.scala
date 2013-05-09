@@ -65,8 +65,7 @@ trait VolatilityTermStructure extends TermStructure {
 
   /** Strike-range check. */
   protected final def checkStrike(strike: Rate, extrapolate: Boolean) {
-    require(extrapolate || allowExtrapolation() ||
-      (strike >= minStrike() && strike <= maxStrike()),
-      "strike ($strike) is outside the curve domain [${minStrike()}, ${maxStrike()}]")
+    require(extrapolate || (strike >= minStrike() && strike <= maxStrike()),
+      s"strike ($strike) is outside the curve domain [${minStrike()}, ${maxStrike()}]")
   }
 }
