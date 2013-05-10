@@ -147,14 +147,14 @@ trait StochasticProcessND extends StochasticProcess {
 
   override final def apply(x0: Vec[Real], dx: Vec[Real]): Vec[Real] = x0 + dx
 
-  def discretization: Discretization
+  def discretization: DiscretizationND
+}
 
-  /** Multi dimensional discretization of a stochastic process over a given time interval. */
-  trait Discretization {
-    def drift(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Vec[Real]
-    def diffusion(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Mat[Real]
-    def covariance(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Mat[Real]
-  }
+/** Multi dimensional discretization of a stochastic process over a given time interval. */
+trait DiscretizationND {
+  def drift(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Vec[Real]
+  def diffusion(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Mat[Real]
+  def covariance(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Mat[Real]
 }
 
 /**
@@ -240,12 +240,12 @@ trait StochasticProcess1D extends StochasticProcess {
 
   override final def apply(x0: Vec[Real], dx: Vec[Real]) = Vec(apply(x0 raw 0, dx raw 0))
 
-  def discretization: Discretization
+  def discretization: Discretization1D
+}
 
-  /** Discretization of a 1-D stochastic process. */
-  trait Discretization {
-    def drift(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real
-    def diffusion(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real
-    def variance(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real
-  }
+/** Discretization of a 1-D stochastic process. */
+trait Discretization1D {
+  def drift(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real
+  def diffusion(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real
+  def variance(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real
 }
