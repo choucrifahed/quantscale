@@ -54,12 +54,6 @@ import scala.util.Failure
  * Volatilities are assumed to be expressed on an annual basis.
  */
 trait BlackVolTermStructure extends VolatilityTermStructure {
-  refDate: ReferenceDate =>
-
-  // val dT: Time = 1.0 / 365.0
-
-  // TODO check if this cannot be moved up in the hierarchy
-  override val businessDayConvention = Following
 
   /** @return spot volatility */
   @inline final def blackVol(maturity: LocalDate, strike: Real): Try[Volatility] =
@@ -186,7 +180,6 @@ trait BlackVolTermStructure extends VolatilityTermStructure {
  * blackVolImpl() method in derived classes.
  */
 trait BlackVolatilityTermStructure extends BlackVolTermStructure {
-  refDate: ReferenceDate =>
 
   /**
    * Black variance calculation.
@@ -204,7 +197,6 @@ trait BlackVolatilityTermStructure extends BlackVolTermStructure {
  * blackVarianceImpl() method in derived classes.
  */
 trait BlackVarianceTermStructure extends BlackVolTermStructure {
-  refDate: ReferenceDate =>
 
   /**
    * Black volatility calculation.
