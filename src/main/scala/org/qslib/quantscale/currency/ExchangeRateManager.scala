@@ -190,4 +190,4 @@ trait ExchangeRateManager {
  *
  * @see MoneySuite test suite for examples of using ExchangeRateManager in unit tests
  */
-object ExchangeRateManager extends ExchangeRateManager
+case object ExchangeRateManager extends ExchangeRateManager

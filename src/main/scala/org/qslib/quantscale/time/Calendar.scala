@@ -65,7 +65,7 @@ trait Calendar {
    * switch-on-type code.
    */
   // TODO check if this is necessary with case objects
-  def name(): String
+  //def name(): String
 
   /** @return true if and only if the date is a business day for the given market */
   def isBusinessDay(date: LocalDate): Boolean

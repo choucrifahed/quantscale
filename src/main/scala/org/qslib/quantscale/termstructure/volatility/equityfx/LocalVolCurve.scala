@@ -20,8 +20,7 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2007 Ferdinando Ametrano
- Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2002, 2003 Ferdinando Ametrano
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -37,42 +36,38 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.termstructure.volatility.equityfx
 
-import org.qslib.quantscale.pattern._
+import org.qslib.quantscale._
+import scala.util.Try
 
-/**
- * Base trait for market observables.
- *
- * @param T either Money or Real
- */
-trait Quote[T] extends Observable {
+/** Local volatility curve derived from a Black curve. */
+// FIXME Find a way to include math formulae in Scaladoc
+case class LocalVolCurve(curve: BlackVarianceCurve) extends LocalVolTermStructure {
 
-  /** @return the current value */
-  def apply(): Option[T]
+  override val businessDayConvention = curve.businessDayConvention
+  override val referenceDate = curve.referenceDate
+  override val calendar = curve.calendar
+  override val dayCounter = curve.dayCounter
+  override val maxDate = curve.maxDate
+  override val minStrike = Double.MinValue
+  override val maxStrike = Double.MaxValue
 
-  def map[U](f: T => U): Quote[U] = new FunctionQuote(this, f)
-
-  override def toString() = s"Quote(${apply()})"
-}
-
-/** Market element returning a stored value. */
-// FIXME toString() needs to tested
-final class SimpleQuote(override val initialValue: Option[Real] = None) extends Quote[Real]
-  with ObservableValue[Option[Real]] with ObservableDefImpl
-
-object SimpleQuote {
-  def apply(initialValue: Real) = new SimpleQuote(Some(initialValue))
-}
-
-final class FunctionQuote[T, U](originalQuote: Quote[T], f: T => U)
-  extends Quote[U] with ObservableDefImpl with Updatable {
-
-  originalQuote.registerObserver(this)
-
-  override final def update() = notifyObservers()
-
-  override final def apply() = originalQuote() map f
-
-  override final def map[V](g: U => V) = new FunctionQuote[T, V](originalQuote, g compose f)
+  /**
+   * The relation:
+   * integral from 0 to T of sigma_L(t)^2 dt = sigma_B^2 T
+   * holds, where sigma_L(t) is the local volatility at time t and
+   * sigma_B(T) is the Black volatility for maturity T.
+   * From the above, the formula
+   * sigma_L(t) = sqrt(derivative by t (sigma_B(t)^2 t))
+   * can be deduced which is here implemented.
+   */
+  protected override def localVolImpl(t: Time, strike: Real): Try[Volatility] = {
+    val dt = 1.0 / 365.0
+    for {
+      var1 <- curve.blackVariance(t, strike, true)
+      var2 <- curve.blackVariance(t + dt, strike, true)
+      derivative = (var2 - var1) / dt
+    } yield Math.sqrt(derivative)
+  }
 }

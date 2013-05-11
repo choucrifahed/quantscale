@@ -77,6 +77,6 @@ case class LinearInterpolation(xValues: Vec[Real], yValues: Vec[Real]) extends I
     x: Real, extrapolate: Boolean = false): Real = 0.0
 }
 
-object LinearInterpolator extends Interpolator {
+case object LinearInterpolator extends Interpolator {
   override final def interpolate(xValues: Vec[Real], yValues: Vec[Real]) = LinearInterpolation(xValues, yValues)
 }

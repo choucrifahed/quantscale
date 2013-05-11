@@ -46,6 +46,7 @@ import org.qslib.quantscale.StochasticProcess1D
 import org.qslib.quantscale.Time
 import org.saddle.Mat
 import org.saddle.Vec
+import scala.util.Try
 
 /** Euler discretization for stochastic processes. */
 // FIXME Find a way to include math formulae in Scaladoc
@@ -53,30 +54,26 @@ import org.saddle.Vec
 case object EulerDiscretization extends Discretization1D with DiscretizationND {
 
   /** @return An approximation of the drift defined as mu(t0, x0) * Delta t. */
-  override def drift(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Vec[Real] =
-    process.drift(t0, x0) * dt
+  override def drift(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Try[Vec[Real]] =
+    for (mu <- process.drift(t0, x0)) yield mu * dt
 
   /** @return An approximation of the drift defined as mu(t0, x0) * Delta t. */
-  override def drift(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real =
-    process.drift(t0, x0) * dt
+  override def drift(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Try[Real] =
+    for (mu <- process.drift(t0, x0)) yield mu * dt
 
   /** @return An approximation of the diffusion defined as sigma(t0, x0) * sqrt(Delta t). */
-  override def diffusion(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Mat[Real] =
-    process.diffusion(t0, x0) * Math.sqrt(dt)
+  override def diffusion(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Try[Mat[Real]] =
+    for (sigma <- process.diffusion(t0, x0)) yield sigma * Math.sqrt(dt)
 
   /** @return An approximation of the diffusion defined as sigma(t0, x0) * sqrt(Delta t). */
-  override def diffusion(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real =
-    process.diffusion(t0, x0) * Math.sqrt(dt)
+  override def diffusion(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Try[Real] =
+    for (sigma <- process.diffusion(t0, x0)) yield sigma * Math.sqrt(dt)
 
   /** @return An approximation of the covariance defined as sigma(t0, x0)^2 * Delta t. */
-  override def covariance(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Mat[Real] = {
-    val sigma = process.diffusion(t0, x0)
-    sigma * sigma.transpose * dt
-  }
+  override def covariance(process: StochasticProcess, t0: Time, x0: Vec[Real], dt: Time): Try[Mat[Real]] =
+    for (sigma <- process.diffusion(t0, x0)) yield sigma * sigma.transpose * dt
 
   /** @return An approximation of the variance defined as sigma(t0, x0)^2 * Delta t. */
-  override def variance(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Real = {
-    val sigma = process.diffusion(t0, x0)
-    sigma * sigma * dt
-  }
+  override def variance(process: StochasticProcess1D, t0: Time, x0: Real, dt: Time): Try[Real] =
+    for (sigma <- process.diffusion(t0, x0)) yield sigma * sigma * dt
 }

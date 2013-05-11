@@ -48,7 +48,6 @@ import org.scala_tools.time.Imports._
  * This trait defines the interface of concrete volatility structures.
  */
 trait VolatilityTermStructure extends TermStructure {
-  refDate: ReferenceDate =>
 
   /** @return The business day convention used in tenor to date conversion. */
   def businessDayConvention(): BusinessDayConvention

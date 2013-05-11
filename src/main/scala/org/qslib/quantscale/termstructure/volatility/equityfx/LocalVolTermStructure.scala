@@ -52,10 +52,6 @@ import scala.util.Try
  * Volatilities are assumed to be expressed on an annual basis.
  */
 trait LocalVolTermStructure extends VolatilityTermStructure {
-  refDate: ReferenceDate =>
-
-  // TODO check if this cannot be moved up in the hierarchy
-  override val businessDayConvention = Following
 
   @inline final def localVol(date: LocalDate, underlyingLevel: Real): Try[Volatility] =
     localVol(date, underlyingLevel, false)
@@ -67,13 +63,12 @@ trait LocalVolTermStructure extends VolatilityTermStructure {
     Try {
       checkRange(t, extrapolate)
       checkStrike(underlyingLevel, extrapolate)
-      localVolImpl(t, underlyingLevel)
-    }
+    } flatMap (Unit => localVolImpl(t, underlyingLevel))
 
   /**
    * This method must be implemented in derived classes to perform the actual volatility
    * calculations. When it is called, range check has already been performed; therefore,
    * it must assume that extrapolation is required.
    */
-  protected def localVolImpl(t: Time, strike: Real): Volatility
+  protected def localVolImpl(t: Time, strike: Real): Try[Volatility]
 }

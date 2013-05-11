@@ -48,32 +48,34 @@ import scala.concurrent.stm._
  */
 trait Observable {
   def notifyObservers()
-  def registerObserver(observer: Observer)
-  def unregisterObserver(observer: Observer)
+  def registerObserver(observer: Updatable)
+  def unregisterObserver(observer: Updatable)
 }
 
 // FIXME check trait Listeners in Akka!
 // TODO Move to test directory when Akka impl is ready
 trait ObservableDefImpl extends Observable {
-  private[this] val observers = new CopyOnWriteArraySet[Observer]
+  private[this] val observers = new CopyOnWriteArraySet[Updatable]
 
   def notifyObservers() {
     observers.toArray.toList.asInstanceOf[List[Observer]].foreach(_.update)
   }
-  def registerObserver(observer: Observer) {
+  def registerObserver(observer: Updatable) {
     observers add observer
   }
-  def unregisterObserver(observer: Observer) {
+  def unregisterObserver(observer: Updatable) {
     observers remove observer
   }
+}
+
+trait Updatable {
+  def update()
 }
 
 /**
  * Object that gets notified when a given observable changes.
  */
-
-trait Observer {
-  def update()
+trait Observer extends Updatable {
   def registerWith(observable: Observable)
   def unregisterWith(observable: Observable)
   def unregisterWithAll()

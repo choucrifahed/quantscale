@@ -20,8 +20,8 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2007 Ferdinando Ametrano
- Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2003 RiskMap srl
+ Copyright (C) 2007 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -37,42 +37,23 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.time.calendar
 
-import org.qslib.quantscale.pattern._
+import org.joda.time.LocalDate
+import org.qslib.quantscale.time._
 
 /**
- * Base trait for market observables.
- *
- * @param T either Money or Real
+ * Calendar for reproducing theoretical calculations.
+ * This calendar has no holidays. It ensures that dates at
+ * whole-month distances have the same day of month.
  */
-trait Quote[T] extends Observable {
+case object NullCalendar extends Calendar {
 
-  /** @return the current value */
-  def apply(): Option[T]
+  override def isBusinessDay(date: LocalDate): Boolean = true
+  override def isWeekend(weekday: WeekDay.Value): Boolean = false
 
-  def map[U](f: T => U): Quote[U] = new FunctionQuote(this, f)
-
-  override def toString() = s"Quote(${apply()})"
-}
-
-/** Market element returning a stored value. */
-// FIXME toString() needs to tested
-final class SimpleQuote(override val initialValue: Option[Real] = None) extends Quote[Real]
-  with ObservableValue[Option[Real]] with ObservableDefImpl
-
-object SimpleQuote {
-  def apply(initialValue: Real) = new SimpleQuote(Some(initialValue))
-}
-
-final class FunctionQuote[T, U](originalQuote: Quote[T], f: T => U)
-  extends Quote[U] with ObservableDefImpl with Updatable {
-
-  originalQuote.registerObserver(this)
-
-  override final def update() = notifyObservers()
-
-  override final def apply() = originalQuote() map f
-
-  override final def map[V](g: U => V) = new FunctionQuote[T, V](originalQuote, g compose f)
+  override def addHoliday(date: LocalDate): Calendar =
+    throw new UnsupportedOperationException
+  override def removeHoliday(date: LocalDate): Calendar =
+    throw new UnsupportedOperationException
 }

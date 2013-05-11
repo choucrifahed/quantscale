@@ -20,8 +20,7 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2007 Ferdinando Ametrano
- Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2002, 2003, 2004 Ferdinando Ametrano
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -37,42 +36,40 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.termstructure.volatility.equityfx
 
-import org.qslib.quantscale.pattern._
+import org.qslib.quantscale._
+import org.qslib.quantscale.time._
+import scala.util.Try
 
 /**
- * Base trait for market observables.
- *
- * @param T either Money or Real
+ * Constant local volatility, no time-strike dependence.
+ * This class implements the LocalVolatilityTermStructure
+ * interface for a constant local volatility (no time/asset
+ * dependence).  Local volatility and Black volatility are the
+ * same when volatility is at most time dependent, so this class
+ * is basically a proxy for BlackVolatilityTermStructure.
  */
-trait Quote[T] extends Observable {
+case class LocalConstantVol(
+  volatility: Quote[Real],
+  referenceDate: ReferenceDate,
+  dayCounter: DayCounter,
+  calendar: Calendar,
+  businessDayConvention: BusinessDayConvention = Following) extends LocalVolTermStructure {
 
-  /** @return the current value */
-  def apply(): Option[T]
+  override val minStrike = Double.MinValue
+  override val maxStrike = Double.MaxValue
+  override val maxDate = MaxDate
 
-  def map[U](f: T => U): Quote[U] = new FunctionQuote(this, f)
-
-  override def toString() = s"Quote(${apply()})"
+  protected override final def localVolImpl(t: Time, strike: Real): Try[Volatility] =
+    Try(volatility().get)
 }
 
-/** Market element returning a stored value. */
-// FIXME toString() needs to tested
-final class SimpleQuote(override val initialValue: Option[Real] = None) extends Quote[Real]
-  with ObservableValue[Option[Real]] with ObservableDefImpl
-
-object SimpleQuote {
-  def apply(initialValue: Real) = new SimpleQuote(Some(initialValue))
-}
-
-final class FunctionQuote[T, U](originalQuote: Quote[T], f: T => U)
-  extends Quote[U] with ObservableDefImpl with Updatable {
-
-  originalQuote.registerObserver(this)
-
-  override final def update() = notifyObservers()
-
-  override final def apply() = originalQuote() map f
-
-  override final def map[V](g: U => V) = new FunctionQuote[T, V](originalQuote, g compose f)
+object LocalConstantVol {
+  def apply(
+    volatility: Real,
+    referenceDate: ReferenceDate,
+    dayCounter: DayCounter,
+    calendar: Calendar): LocalConstantVol =
+    LocalConstantVol(SimpleQuote(volatility), referenceDate, dayCounter, calendar)
 }

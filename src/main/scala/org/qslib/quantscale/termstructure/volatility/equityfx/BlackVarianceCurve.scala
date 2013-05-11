@@ -58,21 +58,22 @@ import scala.util.Try
  *
  * @see BlackVarianceSurface for strike dependence.
  */
-class BlackVarianceCurve(
-  val dates: Vec[LocalDate],
-  val blackVolCurve: Vec[Volatility],
-  override val dayCounter: DayCounter,
-  override val calendar: Calendar,
-  val forceMonotoneVariance: Boolean = true) extends BlackVarianceTermStructure {
-
-  self: ReferenceDate with Interpolator =>
+case class BlackVarianceCurve(
+  dates: Vec[LocalDate],
+  blackVolCurve: Vec[Volatility],
+  referenceDate: ReferenceDate,
+  dayCounter: DayCounter,
+  calendar: Calendar,
+  interpolator: Interpolator,
+  businessDayConvention: BusinessDayConvention = Following,
+  forceMonotoneVariance: Boolean = true) extends BlackVarianceTermStructure {
 
   require(dates.length == blackVolCurve.length,
     s"Mismatch between date sequence size (${dates.length}) and black vol sequence size (${blackVolCurve.length}")
 
   // Cannot have dates()==referenceDate, since the value of the vol at dates(0) would be lost.
   // Variance at referenceDate must be zero.
-  require(dates.first.get > referenceDate, s"Cannot have dates(0)(${dates(0)} <= referenceDate ($referenceDate)")
+  require(dates.first.get > referenceDate(), s"Cannot have dates(0)(${dates(0)} <= referenceDate ($referenceDate)")
   require(dates.isStrictlyAscending, "Dates must be strictly sorted in an ascending order")
 
   override val minStrike = Double.MinValue
@@ -84,7 +85,7 @@ class BlackVarianceCurve(
 
   require(!forceMonotoneVariance || variances.isAscending, "Variance must be non-decreasing")
 
-  private val varianceCurve = self.interpolate(times, variances)
+  private val varianceCurve = interpolator.interpolate(times, variances)
 
   protected override final def blackVarianceImpl(t: Time, strike: Real): Try[Real] = Try {
     if (t <= times.last) {

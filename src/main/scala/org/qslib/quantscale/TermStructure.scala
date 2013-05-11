@@ -56,7 +56,6 @@ import scala.util.Success
  * some other structure.
  */
 trait TermStructure {
-  refDate: ReferenceDate =>
 
   /** @return the day counter used for date/time conversion. */
   def dayCounter(): DayCounter
@@ -72,7 +71,7 @@ trait TermStructure {
   @inline final def maxTime(): Time = timeFromReference(maxDate())
 
   /** @return the date at which discount = 1.0 and/or variance = 0.0. */
-  def referenceDate(): LocalDate = refDate()
+  def referenceDate: ReferenceDate
 
   /** @return the calendar used for reference and/or option date calculation. */
   def calendar(): Calendar
@@ -96,15 +95,13 @@ sealed trait ReferenceDate {
   def apply(): LocalDate
 }
 
-class FixedReferenceDate(date: LocalDate) extends ReferenceDate {
+case class FixedReferenceDate(date: LocalDate) extends ReferenceDate {
   override def apply() = date
 }
 
-class MovingReferenceDate(val settlementDays: Natural) extends ReferenceDate {
-  termStructure: TermStructure =>
-
+case class MovingReferenceDate(val calendar: Calendar, val settlementDays: Natural) extends ReferenceDate {
   override def apply() = {
     val today = Settings.evaluationDate()
-    termStructure.calendar.advance(today, settlementDays, time.TUDays)
+    calendar.advance(today, settlementDays, time.TUDays)
   }
 }

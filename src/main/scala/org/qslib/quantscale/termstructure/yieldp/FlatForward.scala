@@ -20,8 +20,8 @@
  When applicable, the original copyright notice follows this notice.
  */
 /*
- Copyright (C) 2007 Ferdinando Ametrano
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
+ Copyright (C) 2003, 2004, 2005, 2007 StatPro Italia srl
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -37,42 +37,53 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale
+package org.qslib.quantscale.termstructure.yieldp
 
-import org.qslib.quantscale.pattern._
+import org.qslib.quantscale._
+import org.qslib.quantscale.termstructure.YieldTermStructure
+import org.qslib.quantscale.time._
+import scala.util.Try
 
-/**
- * Base trait for market observables.
- *
- * @param T either Money or Real
- */
-trait Quote[T] extends Observable {
+/** Flat interest-rate curve. */
+case class FlatForward(
+  forward: Quote[Real],
+  referenceDate: ReferenceDate,
+  dayCounter: DayCounter,
+  calendar: Calendar,
+  compounding: Compounding = Continuous,
+  frequency: Frequency = Annual) extends YieldTermStructure {
 
-  /** @return the current value */
-  def apply(): Option[T]
+  override val maxDate = MaxDate
+  override val jumps = Seq()
+  override val jumpDates = Seq()
 
-  def map[U](f: T => U): Quote[U] = new FunctionQuote(this, f)
-
-  override def toString() = s"Quote(${apply()})"
+  protected override def discountImpl(t: Time): Try[DiscountFactor] = Try {
+    InterestRate(forward().get, dayCounter, compounding, frequency).discountFactor(t)
+  }
 }
 
-/** Market element returning a stored value. */
-// FIXME toString() needs to tested
-final class SimpleQuote(override val initialValue: Option[Real] = None) extends Quote[Real]
-  with ObservableValue[Option[Real]] with ObservableDefImpl
+object FlatForward {
+  def apply(
+    forward: Real,
+    referenceDate: ReferenceDate,
+    dayCounter: DayCounter,
+    calendar: Calendar): FlatForward =
+    FlatForward(SimpleQuote(forward), referenceDate, dayCounter, calendar)
 
-object SimpleQuote {
-  def apply(initialValue: Real) = new SimpleQuote(Some(initialValue))
-}
+  def apply(
+    forward: Real,
+    referenceDate: ReferenceDate,
+    dayCounter: DayCounter,
+    calendar: Calendar,
+    compounding: Compounding): FlatForward =
+    FlatForward(SimpleQuote(forward), referenceDate, dayCounter, calendar, compounding)
 
-final class FunctionQuote[T, U](originalQuote: Quote[T], f: T => U)
-  extends Quote[U] with ObservableDefImpl with Updatable {
-
-  originalQuote.registerObserver(this)
-
-  override final def update() = notifyObservers()
-
-  override final def apply() = originalQuote() map f
-
-  override final def map[V](g: U => V) = new FunctionQuote[T, V](originalQuote, g compose f)
+  def apply(
+    forward: Real,
+    referenceDate: ReferenceDate,
+    dayCounter: DayCounter,
+    calendar: Calendar,
+    compounding: Compounding,
+    frequency: Frequency): FlatForward =
+    FlatForward(SimpleQuote(forward), referenceDate, dayCounter, calendar, compounding, frequency)
 }

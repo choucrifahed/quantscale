@@ -47,6 +47,7 @@ import org.qslib.quantscale.Implicits.dt
 import org.joda.time.LocalDate
 import org.qslib.quantscale.time._
 import org.scala_tools.time.Imports._
+import scala.util.Try
 
 /**
  * ==Interest-Rate Term Structure==
@@ -54,7 +55,6 @@ import org.scala_tools.time.Imports._
  * This trait defines the interface of concrete interest rate structures.
  */
 trait YieldTermStructure extends TermStructure {
-  refDate: ReferenceDate =>
 
   require(jumps.size == jumpDates.size, "Mismatch between number of jumps (" + jumps.size +
     ") and jump dates (" + jumpDates.size + ").")
@@ -76,11 +76,11 @@ trait YieldTermStructure extends TermStructure {
    * @return The discount factor from a given date to the reference date.
    */
   @inline
-  final def discountDate(date: LocalDate, extrapolate: Boolean = false): DiscountFactor =
+  final def discountDate(date: LocalDate, extrapolate: Boolean = false): Try[DiscountFactor] =
     discount(timeFromReference(date), extrapolate)
 
   /** @return The discount factor from a given time to the reference date. */
-  final def discount(t: Time, extrapolate: Boolean = false): DiscountFactor = {
+  final def discount(t: Time, extrapolate: Boolean = false): Try[DiscountFactor] = {
     def loop(i: Int, jumpEffect: Real): Real = {
       val jumpTime = jumpTimes.apply(i)
       if (jumpTime > 0 && jumpTime < t) loop(i + 1, jumpEffect * jumps(i)().getOrElse(0.0))
@@ -93,7 +93,7 @@ trait YieldTermStructure extends TermStructure {
       discountImpl(t)
     } else {
       val jumpEffect = loop(0, 1.0)
-      jumpEffect * discountImpl(t)
+      discountImpl(t).map(_ * jumpEffect)
     }
   }
 
@@ -106,14 +106,14 @@ trait YieldTermStructure extends TermStructure {
     resultDayCounter: DayCounter,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false): InterestRate = {
+    extrapolate: Boolean = false): Try[InterestRate] = Try {
     if (date == referenceDate()) {
-      val compound = 1.0 / discount(dt, extrapolate)
+      val compound = 1.0 / discount(dt, extrapolate).get
       // t has been calculated with a possibly different day counter
       // but the difference should not matter for very small times
       InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, dt)
     } else {
-      val compound = 1.0 / discountDate(date, extrapolate)
+      val compound = 1.0 / discountDate(date, extrapolate).get
       InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, referenceDate(), date)
     }
   }
@@ -127,10 +127,10 @@ trait YieldTermStructure extends TermStructure {
   final def zeroRateTime(t: Time,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false): InterestRate = {
+    extrapolate: Boolean = false): Try[InterestRate] = Try {
 
     val time = if (t == 0.0) dt else t
-    val compound = 1.0 / discount(time, extrapolate)
+    val compound = 1.0 / discount(time, extrapolate).get
     InterestRate.impliedRate(compound, dayCounter, compounding, frequency, time)
   }
 
@@ -145,19 +145,26 @@ trait YieldTermStructure extends TermStructure {
     resultDayCounter: DayCounter,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false): InterestRate = {
+    extrapolate: Boolean = false): Try[InterestRate] = {
     if (startDate == endDate) {
       checkRange(startDate, extrapolate)
       val t1 = (timeFromReference(startDate) - dt / 2.0) max 0.0
       val t2 = t1 + dt
-      val compound = discount(t1, true) / discount(t2, true)
-      // times have been calculated with a possibly different day counter
+
+      for {
+        d1 <- discount(t1, true)
+        d2 <- discount(t2, true)
+        compound = d1 / d2
+      } // times have been calculated with a possibly different day counter
       // but the difference should not matter for very small times
-      InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, dt)
+      yield InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, dt)
     } else {
       require(startDate < endDate, s"$startDate later than $endDate")
-      val compound = discountDate(startDate, extrapolate) / discountDate(endDate, extrapolate)
-      InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, startDate, endDate)
+      for {
+        d1 <- discountDate(startDate, extrapolate)
+        d2 <- discountDate(endDate, extrapolate)
+        compound = d1 / d2
+      } yield InterestRate.impliedRate(compound, resultDayCounter, compounding, frequency, startDate, endDate)
     }
   }
 
@@ -175,7 +182,7 @@ trait YieldTermStructure extends TermStructure {
     resultDayCounter: DayCounter,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false): InterestRate =
+    extrapolate: Boolean = false): Try[InterestRate] =
     forwardRateDate(date, date + period, resultDayCounter, compounding, frequency, extrapolate)
 
   /**
@@ -188,16 +195,16 @@ trait YieldTermStructure extends TermStructure {
     endTime: Time,
     compounding: Compounding,
     frequency: Frequency = Annual,
-    extrapolate: Boolean = false): InterestRate = {
+    extrapolate: Boolean = false): Try[InterestRate] = Try {
 
     val (diff, compound) = if (startTime == endTime) {
       checkRange(startTime, extrapolate)
       val t1 = (startTime - dt / 2.0) max 0.0
       val t2 = t1 + dt
-      (dt, discount(t1, true) / discount(t2, true))
+      (dt, discount(t1, true).get / discount(t2, true).get)
     } else {
       require(startTime < endTime, s"endTime ($endTime) < t1 ($startTime)")
-      (endTime - startTime, discount(startTime, extrapolate) / discount(endTime, extrapolate))
+      (endTime - startTime, discount(startTime, extrapolate).get / discount(endTime, extrapolate).get)
     }
 
     InterestRate.impliedRate(compound, dayCounter, compounding, frequency, diff)
@@ -209,5 +216,5 @@ trait YieldTermStructure extends TermStructure {
    * range check has already been performed; therefore, it
    * must assume that extrapolation is required.
    */
-  protected def discountImpl(t: Time): DiscountFactor
+  protected def discountImpl(t: Time): Try[DiscountFactor]
 }
