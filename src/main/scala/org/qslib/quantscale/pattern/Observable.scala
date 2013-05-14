@@ -120,12 +120,9 @@ trait ObservableValue[T] extends Observable {
    * @return The old value.
    * @note This method will notify observers of the value change if applicable.
    */
-  def update(newValue: T): T = atomic { implicit txn =>
-    val oldValue = valueRef()
-    if (oldValue != newValue) {
-      valueRef() = newValue
-      notifyObservers()
-    }
+  def update(newValue: T): T = {
+    val oldValue = valueRef.single.swap(newValue)
+    if (oldValue != newValue) notifyObservers()
     oldValue
   }
 

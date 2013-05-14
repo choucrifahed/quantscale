@@ -52,15 +52,10 @@ import scala.concurrent.Future
  * @author Choucri FAHED
  * @since 1.0
  */
-trait PricingEngine extends Observable {
+trait PricingEngine {
+  type InstrumentType <: Instrument
 
-  //protected def validate(argument: A): Try[A]
-
-  def calculate(instrument: Instrument): Future[instrument.ResultsType]
-
-  def update() {
-    notifyObservers()
-  }
+  def calculate(instrument: InstrumentType): Future[instrument.ResultsType]
 }
 
 /** Generic trait for results returned by a pricing engine */

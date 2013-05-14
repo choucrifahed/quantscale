@@ -57,7 +57,7 @@ object Implicits {
   implicit class AlmostEqualDecimal(val d: Decimal) extends AnyVal {
     def ~=(d2: Decimal)(implicit p: math.Precision): Boolean = {
       val diff = (d - d2).abs
-      (diff == 0.0) || (if (d == 0.0) diff / d2 <= p.p else diff / d <= p.p)
+      diff == 0.0 || diff <= d * p.p || diff <= d2 * p.p
     }
   }
 

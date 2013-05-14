@@ -62,8 +62,11 @@ trait FloatingTypePayoff extends TypePayoff {
  *
  *  @tparam T type of the strike: could be Money or Real...
  */
-trait StrikedTypePayoff[T] extends TypePayoff {
-  def strike(): T
+trait StrikedTypePayoff extends TypePayoff {
+  type StrikeType
+
+  def strike(): StrikeType
+  def strikeValue(): Real
 }
 
 /** Dummy Payoff class */
@@ -73,7 +76,11 @@ case object NullPayoff extends Payoff {
 }
 
 /** Plain-vanilla payoff */
-case class PlainVanillaPayoff(optionType: OptionType, strike: Money) extends StrikedTypePayoff[Money] {
+case class PlainVanillaPayoff(optionType: OptionType, strike: Money) extends StrikedTypePayoff {
+  override type StrikeType = Money
+
+  override val strikeValue = strike.value
+
   override def apply(price: Money): Money = optionType match {
     case Call => (price - strike) max (Money zero strike.currency)
     case Put => (strike - price) max (Money zero strike.currency)
@@ -81,8 +88,12 @@ case class PlainVanillaPayoff(optionType: OptionType, strike: Money) extends Str
 }
 
 /** Payoff with strike expressed as percentage */
-case class PercentageStrikePayoff(optionType: OptionType, moneyness: Real) extends StrikedTypePayoff[Real] {
+case class PercentageStrikePayoff(optionType: OptionType, moneyness: Real) extends StrikedTypePayoff {
+  override type StrikeType = Real
+
   override val strike = moneyness
+  override val strikeValue = strike
+
   override def apply(price: Money): Money = optionType match {
     case Call => price * ((1.0 - moneyness) max 0.0)
     case Put => price * ((moneyness - 1.0) max 0.0)
@@ -97,7 +108,11 @@ case class PercentageStrikePayoff(optionType: OptionType, moneyness: Real) exten
 
 /** Binary asset-or-nothing payoff */
 case class AssetOrNothingPayoff(optionType: OptionType, strike: Money)
-  extends StrikedTypePayoff[Money] {
+  extends StrikedTypePayoff {
+  override type StrikeType = Money
+
+  override val strikeValue = strike.value
+
   override def apply(price: Money): Money = optionType match {
     case Call => if (price > strike) price else Money zero strike.currency
     case Put => if (strike > price) price else Money zero strike.currency
@@ -106,7 +121,11 @@ case class AssetOrNothingPayoff(optionType: OptionType, strike: Money)
 
 /** Binary cash-or-nothing payoff */
 case class CashOrNothingPayoff(optionType: OptionType, strike: Money, cashPayoff: Money)
-  extends StrikedTypePayoff[Money] {
+  extends StrikedTypePayoff {
+  override type StrikeType = Money
+
+  override val strikeValue = strike.value
+
   override def apply(price: Money): Money = optionType match {
     case Call => if (price > strike) cashPayoff else Money zero strike.currency
     case Put => if (strike > price) cashPayoff else Money zero strike.currency
@@ -124,7 +143,11 @@ case class CashOrNothingPayoff(optionType: OptionType, strike: Money, cashPayoff
  * WARNING: This payoff can be negative depending on the strikes
  */
 case class GapPayoff(optionType: OptionType, strike: Money, secondStrike: Money)
-  extends StrikedTypePayoff[Money] {
+  extends StrikedTypePayoff {
+  override type StrikeType = Money
+
+  override val strikeValue = strike.value
+
   override def apply(price: Money): Money = optionType match {
     case Call => if (price >= strike) price - secondStrike else Money zero strike.currency
     case Put => if (strike >= price) secondStrike - price else Money zero strike.currency
@@ -143,23 +166,31 @@ case class GapPayoff(optionType: OptionType, strike: Money, secondStrike: Money)
  * b) short (long) an AssetOrNothing Call (Put) at the higher strike
  */
 case class SuperFundPayoff(strike: Money, secondStrike: Money)
-  extends StrikedTypePayoff[Money] {
+  extends StrikedTypePayoff {
   require(strike.isStrictlyPositive, "Strike (" + strike + ") must be strictly positive.")
   require(secondStrike > strike, "Second strike (" + secondStrike +
     ") must be higher than first strike (" + strike + ").")
 
+  override type StrikeType = Money
+
   override val optionType = Call
+  override val strikeValue = strike.value
+
   override def apply(price: Money): Money =
     if (price >= strike && price < secondStrike) price / strike else Money zero strike.currency
 }
 
 /** Binary Supershare Payoff */
 case class SuperSharePayoff(strike: Money, secondStrike: Money, cashPayoff: Money)
-  extends StrikedTypePayoff[Money] {
+  extends StrikedTypePayoff {
   require(secondStrike > strike, "Second strike (" + secondStrike +
     ") must be higher than first strike (" + strike + ").")
 
+  override type StrikeType = Money
+
   override val optionType = Call
+  override val strikeValue = strike.value
+
   override def apply(price: Money): Money =
     if (price >= strike && price < secondStrike) cashPayoff else Money zero strike.currency
 }
