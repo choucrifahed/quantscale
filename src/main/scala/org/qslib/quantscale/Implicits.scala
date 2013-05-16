@@ -64,21 +64,46 @@ object Implicits {
   implicit class RichVec[T: Ordering: ClassTag](val vec: Vec[T]) {
 
     /** @return true if for every 2 consecutive elements x1 and x2, x1 < x2 */
-    def isStrictlyAscending() = isSorted((x1, x2) => implicitly[Ordering[T]].lt(x1, x2))
+    def isStrictlyAscending = isSorted((x1, x2) => implicitly[Ordering[T]].lt(x1, x2))
 
     /** @return true if for every 2 consecutive elements x1 and x2, x1 <= x2 */
-    def isAscending() = isSorted((x1, x2) => implicitly[Ordering[T]].lteq(x1, x2))
+    def isAscending = isSorted((x1, x2) => implicitly[Ordering[T]].lteq(x1, x2))
 
     /** @return true if for every 2 consecutive elements x1 and x2, x1 > x2 */
-    def isStrictlyDescending() = isSorted((x1, x2) => implicitly[Ordering[T]].gt(x1, x2))
+    def isStrictlyDescending = isSorted((x1, x2) => implicitly[Ordering[T]].gt(x1, x2))
 
     /** @return true if for every 2 consecutive elements x1 and x2, x1 >= x2 */
-    def isDescending() = isSorted((x1, x2) => implicitly[Ordering[T]].gteq(x1, x2))
+    def isDescending = isSorted((x1, x2) => implicitly[Ordering[T]].gteq(x1, x2))
 
     private def isSorted(order: (T, T) => Boolean): Boolean =
       vec.zipMap(vec.tail(vec.length - 1))(order).foldLeft(true)((b1, b2) => b1 && b2)
 
-    def upperBound(from: Int, to: Int, x: T): Int = {
+    /** @return a vector of unique elements keeping the original order of elements */
+    def unique(same: (T, T) => Boolean): Vec[T] =
+      vec.foldLeft(Vec(vec.first.get))((v, e) =>
+        if (same(v.last.get, e)) v else v.concat(Vec(e)))
+
+    def lowerBound(x: T, from: Int = 0, to: Int = vec.length): Int = {
+      require(from >= 0 && from <= to && to <= vec.length)
+
+      def loop(len: Int, from: Int): Int = {
+        if (len == 0) from
+        else {
+          val half = len >> 1
+          val middle = from + half
+          if (implicitly[Ordering[T]].lt(x, vec raw middle)) {
+            loop(len - (half + 1), middle + 1)
+          } else {
+            loop(half, from)
+          }
+        }
+      }
+
+      val len = to - from
+      loop(len, from)
+    }
+
+    def upperBound(x: T, from: Int = 0, to: Int = vec.length): Int = {
       require(from >= 0 && from <= to && to <= vec.length)
 
       def loop(len: Int, from: Int): Int = {

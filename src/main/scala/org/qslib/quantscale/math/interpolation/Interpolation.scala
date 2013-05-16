@@ -97,7 +97,7 @@ trait Interpolation {
   protected final def locate(x: Real): Int =
     if (x < xMin) 0
     else if (x > xMax) xValues.length - 2
-    else xValues.upperBound(0, xValues.length - 1, x) - 1
+    else xValues.upperBound(x, 0, xValues.length - 1 /* FIXME test the -1 */) - 1
 
   protected final def checkRange(x: Real, extrapolate: Boolean) {
     require(extrapolate || isInRange(x),
