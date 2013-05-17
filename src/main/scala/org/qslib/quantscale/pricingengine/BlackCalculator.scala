@@ -85,7 +85,7 @@ case class BlackCalculator(
           f.derivative(d2))
       }
     } else {
-      if (forward ~= strike) (0.0, 0.0, 0.5, 0.5, Math.sqrt(2 / Math.PI), Math.sqrt(2 / Math.PI))
+      if (forward ~= strike) (0.0, 0.0, 0.5, 0.5, M_SQRT_2 * M_1_SQRTPI, M_SQRT_2 * M_1_SQRTPI)
       else if (forward > strike) (Double.MaxValue, Double.MaxValue, 1.0, 1.0, 0.0, 0.0)
       else (Double.MinValue, Double.MinValue, 0.0, 0.0, 0.0, 0.0)
     }
