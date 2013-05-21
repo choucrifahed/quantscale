@@ -48,7 +48,7 @@ import org.scala_tools.time.Imports._
  * @author Choucri FAHED
  * @since 1.0
  */
-trait Exercise {
+sealed trait Exercise {
   def date(index: Int): LocalDate = allDates(index)
   def lastDate: LocalDate = allDates.last
 
