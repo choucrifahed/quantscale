@@ -25,6 +25,7 @@ package org.qslib.quantscale
 import org.qslib.quantscale.currency.ExchangeRateManager
 import org.saddle.Vec
 import scala.reflect.ClassTag
+import org.qslib.quantscale.method.finitedifference.TridiagonalOperator
 
 /**
  * Implicit values and classes for syntactic sugar.
@@ -53,6 +54,10 @@ object Implicits {
     def /(money: Money)(implicit mcc: MoneyConversionConfig) = Money(value / money.value, money.currency)(mcc)
   }
 
+  implicit class RealToTridiagonalOperator(val value: Real) extends AnyVal {
+    def *(op: TridiagonalOperator) = op * value
+  }
+
   /** Shortcut to tell if 2 decimals are close enough given a precision */
   implicit class AlmostEqualDecimal(val d: Decimal) extends AnyVal {
     def ~=(d2: Decimal)(implicit p: math.Precision): Boolean = {
@@ -62,6 +67,13 @@ object Implicits {
   }
 
   implicit class RichVec[T: Ordering: ClassTag](val vec: Vec[T]) {
+
+    /** @return a copy of the vector with the ith element modified */
+    def update(i: Int, x: T): Vec[T] = {
+      val newArray = vec.contents
+      newArray(i) = x
+      Vec(newArray: _*)
+    }
 
     /** @return true if for every 2 consecutive elements x1 and x2, x1 < x2 */
     def isStrictlyAscending = isSorted((x1, x2) => implicitly[Ordering[T]].lt(x1, x2))
