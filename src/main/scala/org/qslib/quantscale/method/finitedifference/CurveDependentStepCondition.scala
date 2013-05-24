@@ -77,7 +77,7 @@ object CurveDependentStepCondition {
   }
 }
 
-trait CurveDependentStepConditionFactory[T] {
+trait CurveDependentStepConditionFactory[T <: CurveDependentStepCondition] {
   def apply(wrapper: CurveDependentStepCondition.Wrapper): T
 
   def apply(optionType: OptionType, strike: Money): T =

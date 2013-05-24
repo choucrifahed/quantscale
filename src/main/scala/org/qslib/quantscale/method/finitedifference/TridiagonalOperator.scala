@@ -143,8 +143,8 @@ case class TridiagonalOperator(
 
     val zero = Vec(0)
     val diagProd = diagonal * v
-    val lowerProd = (lowerDiagonal * v.slice(0, size - 1)) concat zero
-    val upperProd = zero concat (upperDiagonal * v.slice(1, size))
+    val lowerProd = (lowerDiagonal * v.withoutLast()) concat zero
+    val upperProd = zero concat (upperDiagonal * v.tail())
 
     lowerProd + diagProd + upperProd
   }

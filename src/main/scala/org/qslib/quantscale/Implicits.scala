@@ -68,6 +68,9 @@ object Implicits {
 
   implicit class RichVec[T: Ordering: ClassTag](val vec: Vec[T]) {
 
+    @inline def withoutLast() = vec.head(vec.length - 1)
+    @inline def tail() = vec.tail(vec.length - 1)
+
     /** @return a copy of the vector with the ith element modified */
     def update(i: Int, x: T): Vec[T] = {
       val newArray = vec.contents
