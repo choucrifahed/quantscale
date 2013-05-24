@@ -53,7 +53,7 @@ trait TypePayoff extends Payoff {
 // Maybe change to case object since all methods are implemented
 /** Payoff based on a floating strike */
 trait FloatingTypePayoff extends TypePayoff {
-  override def apply(m: Money): Money =
+  override def apply(p: Real): Real =
     throw new UnsupportedOperationException("Floating payoff not handled")
 }
 
@@ -67,11 +67,12 @@ trait StrikedTypePayoff extends TypePayoff {
 
   def strike(): StrikeType
   def strikeValue(): Real
+  def apply(price: Money): Money
 }
 
 /** Dummy Payoff class */
 case object NullPayoff extends Payoff {
-  override def apply(m: Money): Money =
+  override def apply(p: Real): Real =
     throw new UnsupportedOperationException("Dummy payoff given")
 }
 
@@ -80,6 +81,11 @@ case class PlainVanillaPayoff(optionType: OptionType, strike: Money) extends Str
   override type StrikeType = Money
 
   override val strikeValue = strike.value
+
+  override def apply(price: Real): Real = optionType match {
+    case Call => (price - strikeValue) max 0.0
+    case Put => (strikeValue - price) max 0.0
+  }
 
   override def apply(price: Money): Money = optionType match {
     case Call => (price - strike) max (Money zero strike.currency)
@@ -94,10 +100,12 @@ case class PercentageStrikePayoff(optionType: OptionType, moneyness: Real) exten
   override val strike = moneyness
   override val strikeValue = strike
 
-  override def apply(price: Money): Money = optionType match {
+  override def apply(price: Real): Real = optionType match {
     case Call => price * ((1.0 - moneyness) max 0.0)
     case Put => price * ((moneyness - 1.0) max 0.0)
   }
+
+  override def apply(price: Money): Money = apply(price.value) * price.currency
 }
 
 /**
@@ -113,6 +121,11 @@ case class AssetOrNothingPayoff(optionType: OptionType, strike: Money)
 
   override val strikeValue = strike.value
 
+  override def apply(price: Real): Real = optionType match {
+    case Call => if (price > strikeValue) price else 0.0
+    case Put => if (strikeValue > price) price else 0.0
+  }
+
   override def apply(price: Money): Money = optionType match {
     case Call => if (price > strike) price else Money zero strike.currency
     case Put => if (strike > price) price else Money zero strike.currency
@@ -125,6 +138,11 @@ case class CashOrNothingPayoff(optionType: OptionType, strike: Money, cashPayoff
   override type StrikeType = Money
 
   override val strikeValue = strike.value
+
+  override def apply(price: Real): Real = optionType match {
+    case Call => if (price > strikeValue) cashPayoff.value else 0.0
+    case Put => if (strikeValue > price) cashPayoff.value else 0.0
+  }
 
   override def apply(price: Money): Money = optionType match {
     case Call => if (price > strike) cashPayoff else Money zero strike.currency
@@ -147,6 +165,11 @@ case class GapPayoff(optionType: OptionType, strike: Money, secondStrike: Money)
   override type StrikeType = Money
 
   override val strikeValue = strike.value
+
+  override def apply(price: Real): Real = optionType match {
+    case Call => if (price >= strikeValue) price - secondStrike.value else 0.0
+    case Put => if (strikeValue >= price) secondStrike.value - price else 0.0
+  }
 
   override def apply(price: Money): Money = optionType match {
     case Call => if (price >= strike) price - secondStrike else Money zero strike.currency
@@ -176,6 +199,9 @@ case class SuperFundPayoff(strike: Money, secondStrike: Money)
   override val optionType = Call
   override val strikeValue = strike.value
 
+  override def apply(price: Real): Real =
+    if (price >= strikeValue && price < secondStrike.value) price / strikeValue else 0.0
+
   override def apply(price: Money): Money =
     if (price >= strike && price < secondStrike) price / strike else Money zero strike.currency
 }
@@ -190,6 +216,9 @@ case class SuperSharePayoff(strike: Money, secondStrike: Money, cashPayoff: Mone
 
   override val optionType = Call
   override val strikeValue = strike.value
+
+  override def apply(price: Real): Real =
+    if (price >= strikeValue && price < secondStrike.value) cashPayoff.value else 0.0
 
   override def apply(price: Money): Money =
     if (price >= strike && price < secondStrike) cashPayoff else Money zero strike.currency
