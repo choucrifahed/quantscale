@@ -47,13 +47,15 @@ case class MixedScheme(
   L: TridiagonalOperator,
   bcs: Seq[BoundaryCondition],
   theta: Real,
-  dt: Time = 0.0) {
+  dt: Time = 0.0) extends Evolver {
 
   final val I = Identity(L.size)
   final val explicitPart = if (theta != 1.0) Some(I - L * ((1.0 - theta) * dt)) else None
   final val implicitPart = if (theta != 0.0) Some(I + L * (theta * dt)) else None
 
-  // Interface
+  // Evolver Interface
+
+  def withStep(newDt: Time): MixedScheme = this.copy(dt = newDt)
 
   def step(t: Time): MixedScheme = if (L.isTimeDependent) {
     // There is an explicit part
