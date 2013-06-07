@@ -55,7 +55,8 @@ trait OneAssetOption extends OptionInstrument {
   override type ResultsType = OneAssetOptionResults
   override val emptyResults = OneAssetOptionResults()
 
-  override def isExpired = SimpleEvent(exercise.lastDate).hasOccurred()
+  override def payoff(): StrikedTypePayoff
+  override final def isExpired = SimpleEvent(exercise.lastDate).hasOccurred()
 
   // Greeks
   def delta() = calculate() map (_.delta)

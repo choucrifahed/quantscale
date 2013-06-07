@@ -121,7 +121,7 @@ trait StochasticProcess extends Updatable with Observable {
     "Date/Time conversion not supported.")
 
   // FIXME is this actually used? Is it worth implementing Observer and Observable?
-  override def update() {
+  final override def update() {
     notifyObservers()
   }
 }

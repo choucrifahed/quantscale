@@ -41,6 +41,7 @@ package org.qslib.quantscale.method.finitedifference
 import org.saddle.Vec
 import org.qslib.quantscale._
 import org.qslib.quantscale.Implicits._
+import org.qslib.quantscale.math.TridiagonalOperator
 
 /** Boundary condition trait for finite difference problems. */
 trait BoundaryCondition {

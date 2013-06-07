@@ -85,7 +85,7 @@ case class BlackVarianceCurve(
 
   require(!forceMonotoneVariance || variances.isAscending, "Variance must be non-decreasing")
 
-  private val varianceCurve = interpolator.interpolate(times, variances)
+  private val varianceCurve = interpolator(times, variances)
 
   protected override final def blackVarianceImpl(t: Time, strike: Real): Try[Real] = Try {
     if (t <= times.last) {

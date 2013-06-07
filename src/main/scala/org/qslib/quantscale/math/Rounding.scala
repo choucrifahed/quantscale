@@ -52,7 +52,7 @@ import org.qslib.quantscale.Decimal
 sealed trait RoundingType
 
 /** Do not round: return the number unmodified. */
-case object None extends RoundingType
+case object NoRounding extends RoundingType
 
 /**
  * The first decimal place past the precision will be rounded up. This differs from the OMG rule which
@@ -91,7 +91,7 @@ case object Ceiling extends RoundingType
 final case class Rounding(precision: Int = 2, roundingType: RoundingType = Closest, digit: Int = 5) {
 
   def apply(value: Decimal): Decimal = {
-    if (roundingType == None) value
+    if (roundingType == NoRounding) value
     else {
       val mult = pow(10.0, precision)
       val neg = value < 0.0

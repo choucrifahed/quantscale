@@ -54,19 +54,19 @@ trait Lattice {
   def timeGrid: TimeGrid
 
   /** Initialize an asset at the given time. */
-  def initialize(da: DiscretizedAsset, time: Time): DiscretizedAsset
+  def initialize[T <: DiscretizedAsset](da: T, time: Time): T
 
   /**
    * Roll back an asset until the given time, performing any
    * needed adjustment.
    */
-  def rollback(da: DiscretizedAsset, to: Time): DiscretizedAsset
+  def rollback[T <: DiscretizedAsset](da: T, to: Time): T
 
   /**
    * Roll back an asset until the given time, but do not perform
    * the final adjustment.
    */
-  def partialRollback(da: DiscretizedAsset, to: Time): DiscretizedAsset
+  def partialRollback[T <: DiscretizedAsset](da: T, to: Time): T
 
   /** Computes the present value of an asset. */
   def presentValue(da: DiscretizedAsset): Real

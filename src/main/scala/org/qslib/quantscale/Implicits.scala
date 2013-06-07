@@ -25,7 +25,7 @@ package org.qslib.quantscale
 import org.qslib.quantscale.currency.ExchangeRateManager
 import org.saddle.Vec
 import scala.reflect.ClassTag
-import org.qslib.quantscale.method.finitedifference.TridiagonalOperator
+import org.qslib.quantscale.math.TridiagonalOperator
 
 /**
  * Implicit values and classes for syntactic sugar.

@@ -41,6 +41,8 @@ package org.qslib.quantscale.method.finitedifference
 
 import org.qslib.quantscale._
 import org.saddle.Vec
+import org.qslib.quantscale.math.TridiagonalOperator
+import org.qslib.quantscale.math.Identity
 
 /** Mixed (explicit/implicit) scheme for finite difference methods. */
 case class MixedScheme(
@@ -81,19 +83,4 @@ case class MixedScheme(
       bcs.foldLeft(implicitPart.solveFor(vIm))((a, bc) => bc.applyAfterSolving(a))
     } else vEx
   }
-}
-
-/** Crank-Nicolson scheme for finite difference methods. */
-object CrankNicolson {
-  def apply(L: TridiagonalOperator, bcs: Seq[BoundaryCondition]) = MixedScheme(L, bcs, 0.5)
-}
-
-/** Forward Euler scheme for finite difference methods. */
-object ExplicitEuler {
-  def apply(L: TridiagonalOperator, bcs: Seq[BoundaryCondition]) = MixedScheme(L, bcs, 0.0)
-}
-
-/** Backward Euler scheme for finite difference methods. */
-object ImplicitEuler {
-  def apply(L: TridiagonalOperator, bcs: Seq[BoundaryCondition]) = MixedScheme(L, bcs, 1.0)
 }

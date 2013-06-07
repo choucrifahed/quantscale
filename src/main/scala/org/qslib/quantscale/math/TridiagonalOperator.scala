@@ -38,12 +38,13 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-package org.qslib.quantscale.method.finitedifference
+package org.qslib.quantscale.math
 
 import org.qslib.quantscale._
 import org.qslib.quantscale.Implicits._
 import org.saddle._
 import scala.annotation.tailrec
+import org.saddle.scalar.Scalar.scalarUnboxD
 
 /**
  * Implementation for tridiagonal operator.
@@ -97,37 +98,37 @@ case class TridiagonalOperator(
 
   // Modifiers - this trait is meant to be immutable, therefore a copy is returned
 
-  def withFirstRow(valB: Real, valC: Real): TridiagonalOperator = {
-    val newD = diagonal.update(0, valB)
-    val newUD = upperDiagonal.update(0, valC)
+  def withFirstRow(diag: Real, high: Real): TridiagonalOperator = {
+    val newD = diagonal.update(0, diag)
+    val newUD = upperDiagonal.update(0, high)
 
     TridiagonalOperator(lowerDiagonal, newD, newUD, time)
   }
 
-  def withMidRow(i: Int, valA: Real, valB: Real, valC: Real): TridiagonalOperator = {
+  def withMidRow(i: Int, low: Real, diag: Real, high: Real): TridiagonalOperator = {
     require(i >= 1 && i <= size - 2, s"i ($i) is out of range size ($size)")
 
-    val newLD = lowerDiagonal.update(i - 1, valA)
-    val newD = diagonal.update(i, valB)
-    val newUD = upperDiagonal.update(i, valC)
+    val newLD = lowerDiagonal.update(i - 1, low)
+    val newD = diagonal.update(i, diag)
+    val newUD = upperDiagonal.update(i, high)
 
     TridiagonalOperator(newLD, newD, newUD, time)
   }
 
-  def withMidRows(valA: Real, valB: Real, valC: Real): TridiagonalOperator = {
+  def withMidRows(low: Real, diag: Real, high: Real): TridiagonalOperator = {
     val ul = vec.ones(size - 3)
     val d = vec.ones(size - 2)
 
-    val newLD = ul.mapValues(_ * valA) concat Vec(lowerDiagonal.raw(size - 2))
-    val newD = Vec(diagonal raw 0) concat d.mapValues(_ * valB) concat Vec(diagonal.raw(size - 1))
-    val newUD = Vec(upperDiagonal raw 0) concat ul.mapValues(_ * valC)
+    val newLD = ul.mapValues(_ * low) concat Vec(lowerDiagonal.raw(size - 2))
+    val newD = Vec(diagonal raw 0) concat d.mapValues(_ * diag) concat Vec(diagonal.raw(size - 1))
+    val newUD = Vec(upperDiagonal raw 0) concat ul.mapValues(_ * high)
 
     TridiagonalOperator(newLD, newD, newUD, time)
   }
 
-  def withLastRow(valA: Real, valB: Real): TridiagonalOperator = {
-    val newLD = lowerDiagonal.update(size - 2, valA)
-    val newD = diagonal.update(size - 1, valB)
+  def withLastRow(low: Real, diag: Real): TridiagonalOperator = {
+    val newLD = lowerDiagonal.update(size - 2, low)
+    val newD = diagonal.update(size - 1, diag)
 
     TridiagonalOperator(newLD, newD, upperDiagonal, time)
   }

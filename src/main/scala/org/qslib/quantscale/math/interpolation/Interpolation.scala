@@ -1,5 +1,5 @@
 /* 
-Copyright (C) 2013 Choucri FAHED
+ Copyright (C) 2013 Choucri FAHED
 
  This source code is release under the BSD License.
 
@@ -63,6 +63,9 @@ trait Interpolation {
 
   def yValues(): Vec[Real]
 
+  @inline final def x(i: Int): Real = xValues raw i
+  @inline final def y(i: Int): Real = yValues raw i
+
   final def apply(x: Real, extrapolate: Boolean = false): Real = {
     checkRange(x, extrapolate)
     value(x)
@@ -90,14 +93,14 @@ trait Interpolation {
   final def isInRange(x: Real): Boolean = (xMin <= x && x <= xMax) || (x ~= xMin) || (x ~= xMax)
 
   protected def value(x: Real): Real
-  protected def primitiveImpl(x: Real, extrapolate: Boolean = false): Real
-  protected def derivativeImpl(x: Real, extrapolate: Boolean = false): Real
-  protected def secondDerivativeImpl(x: Real, extrapolate: Boolean = false): Real
+  protected def primitiveImpl(x: Real): Real
+  protected def derivativeImpl(x: Real): Real
+  protected def secondDerivativeImpl(x: Real): Real
 
   protected final def locate(x: Real): Int =
     if (x < xMin) 0
     else if (x > xMax) xValues.length - 2
-    else xValues.upperBound(x, 0, xValues.length - 1 /* FIXME test the -1 */) - 1
+    else xValues.upperBound(x, 0, xValues.length - 1 /* FIXME test the -1 */ ) - 1
 
   protected final def checkRange(x: Real, extrapolate: Boolean) {
     require(extrapolate || isInRange(x),
@@ -107,5 +110,5 @@ trait Interpolation {
 
 /** Base Interpolation factory trait */
 trait Interpolator {
-  def interpolate(xValues: Vec[Real], yValues: Vec[Real]): Interpolation
+  def apply(xValues: Vec[Real], yValues: Vec[Real]): Interpolation
 }

@@ -49,34 +49,31 @@ case class LinearInterpolation(xValues: Vec[Real], yValues: Vec[Real]) extends I
   private[this] def loop(sAcc: Vec[Real], primitiveConstAcc: Vec[Real], i: Int): (Vec[Real], Vec[Real]) = {
     if (i == xValues.length) (sAcc, primitiveConstAcc)
     else {
-      val dx = xValues.raw(i) - xValues.raw(i - 1)
-      val s = (yValues.raw(i) - yValues.raw(i - 1)) / dx
-      val primitiveConst = primitiveConstAcc.raw(i - 1) + dx * (yValues.raw(i - 1) + 0.5 * dx * s)
+      val dx = x(i) - x(i - 1)
+      val s = (y(i) - y(i - 1)) / dx
+      val primitiveConst = primitiveConstAcc.raw(i - 1) + dx * (y(i - 1) + 0.5 * dx * s)
       loop(sAcc concat Vec(s), primitiveConstAcc concat Vec(primitiveConst), i + 1)
     }
   }
 
   private[this] val (s, primitiveConst) = loop(Vec(), Vec(0.0), 1)
 
-  protected override def value(x: Real): Real = {
-    val i = locate(x)
-    yValues.raw(i) + (x - xValues.raw(i)) * s.raw(i)
+  protected override def value(in: Real): Real = {
+    val i = locate(in)
+    yValues.raw(i) + (in - x(i)) * s.raw(i)
   }
 
-  protected override def primitiveImpl(
-    x: Real, extrapolate: Boolean = false): Real = {
-    val i = locate(x)
-    val dx = x - xValues.raw(i)
-    primitiveConst.raw(i) + dx * (yValues.raw(i) + 0.5 * dx * s.raw(i))
+  protected override def primitiveImpl(in: Real): Real = {
+    val i = locate(in)
+    val dx = in - x(i)
+    primitiveConst.raw(i) + dx * (y(i) + 0.5 * dx * s.raw(i))
   }
 
-  protected override def derivativeImpl(
-    x: Real, extrapolate: Boolean = false): Real = s raw locate(x)
+  protected override def derivativeImpl(x: Real): Real = s raw locate(x)
 
-  protected override def secondDerivativeImpl(
-    x: Real, extrapolate: Boolean = false): Real = 0.0
+  protected override def secondDerivativeImpl(x: Real): Real = 0.0
 }
 
 case object LinearInterpolator extends Interpolator {
-  override final def interpolate(xValues: Vec[Real], yValues: Vec[Real]) = LinearInterpolation(xValues, yValues)
+  override def apply(xValues: Vec[Real], yValues: Vec[Real]) = LinearInterpolation(xValues, yValues)
 }

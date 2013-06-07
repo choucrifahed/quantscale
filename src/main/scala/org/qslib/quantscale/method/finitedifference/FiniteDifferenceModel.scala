@@ -44,6 +44,7 @@ import org.qslib.quantscale.Implicits._
 import scala.collection.SortedSet
 import scala.annotation.tailrec
 import scala.math._
+import org.qslib.quantscale.math.TridiagonalOperator
 
 /** Generic finite difference model. */
 case class FiniteDifferenceModel(evolver: Evolver, stoppingTimeSet: SortedSet[Time]) {
@@ -107,4 +108,12 @@ case class FiniteDifferenceModel(evolver: Evolver, stoppingTimeSet: SortedSet[Ti
 
     loop1(0, t, u1, evolver0)
   }
+}
+
+/** Default choice for finite-difference model. */
+object StandardFiniteDifferenceModel {
+  def apply(L: TridiagonalOperator,
+    bcs: Seq[BoundaryCondition],
+    stoppingTimeSet: SortedSet[Time]): FiniteDifferenceModel =
+    FiniteDifferenceModel(CrankNicolson(L, bcs), stoppingTimeSet)
 }
