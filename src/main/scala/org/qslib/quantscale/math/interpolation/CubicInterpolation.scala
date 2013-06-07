@@ -21,7 +21,7 @@
  */
 /*
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
- Copyright (C) 2001, 2002, 2003 Nicolas Di Césaré
+ Copyright (C) 2001, 2002, 2003 Nicolas Di Cesare
  Copyright (C) 2004, 2008, 2009, 2011 Ferdinando Ametrano
  Copyright (C) 2009 Sylvain Bertrand
 
@@ -59,7 +59,7 @@ import org.qslib.quantscale.math.TridiagonalOperator
  * near x_i to calculate each f'_i. Non-local schemes (Spline with
  * different boundary conditions) use all f_i values and obtain
  * f'_i by solving a linear system of equations. Local schemes
- * produce C^1 interpolants, while the spline schemes generate $C^2$
+ * produce C^1 interpolants, while the spline schemes generate C^2
  * interpolants.
  *
  * Hyman's monotonicity constraint filter is also implemented: It can be
