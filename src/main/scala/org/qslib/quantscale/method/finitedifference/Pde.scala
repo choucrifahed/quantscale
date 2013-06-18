@@ -44,6 +44,7 @@ import org.qslib.quantscale.math.TridiagonalOperator
 import org.saddle.Vec
 import scala.util.Try
 import scala.util.Success
+import org.qslib.quantscale.math.TridiagonalOperatorTimeSetter
 
 /** General trait for one dimensional PDEs */
 trait PdeSecondOrderParabolic {
@@ -85,4 +86,15 @@ object PdeConstantCoeff {
     drift <- pde.drift(t, x)
     discount <- pde.discount(t, x)
   } yield PdeConstantCoeff(diffusion, drift, discount)
+}
+
+case class GenericTimeSetter(grid: TransformedGrid, pde: PdeSecondOrderParabolic)
+  extends TridiagonalOperatorTimeSetter {
+  override def apply(t: Time, L: TridiagonalOperator) = pde.generateOperator(t, grid, L)
+}
+
+case class PdeOperator(grid: TransformedGrid, pde: PdeSecondOrderParabolic, residualTime: Time = 0.0) {
+  val timeSetter = GenericTimeSetter(grid, pde)
+
+  def apply(L: TridiagonalOperator): TridiagonalOperator = timeSetter(residualTime, L)
 }

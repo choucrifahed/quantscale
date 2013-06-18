@@ -140,8 +140,8 @@ trait FDEngineModule {
       SampledCurve(newGrid, payoff)
     }
 
-    protected def initializeBoundaryConditions(): FDEngine
     protected def initializeOperator(): FDEngine
+    protected def initializeBoundaryConditions(): FDEngine
     protected def getResidualTime(): Time = process.time(exerciseDate)
 
     // Data

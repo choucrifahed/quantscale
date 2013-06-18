@@ -50,6 +50,7 @@ case class TransformedGrid(
   dxp: Vec[Real],
   dx: Vec[Real]) {
 
+  def size = grid.length
   def grid(i: Int): Real = grid raw i
   def transformedGrid(i: Int): Real = transformedGrid raw i
   def dxm(i: Int): Real = dxm raw i

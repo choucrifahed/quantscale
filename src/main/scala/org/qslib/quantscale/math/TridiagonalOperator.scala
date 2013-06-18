@@ -227,6 +227,10 @@ case class TridiagonalOperator(
   }
 }
 
+trait TridiagonalOperatorTimeSetter {
+  def apply(t: Time, L: TridiagonalOperator): TridiagonalOperator
+}
+
 object Zero {
 
   /** @return A square zero matrix. */
