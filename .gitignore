@@ -16,3 +16,5 @@ project/plugins/project/
 .scala_dependencies
 .settings/
 .worksheet/
+.idea/
+.idea_modules/

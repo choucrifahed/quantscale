@@ -86,8 +86,11 @@ case class TimeGrid(times: Vec[Time], dt: Vec[Time], mandatoryTimes: Vec[Time]) 
   def closestTime(t: Time): Time = times raw closestIndex(t)
 
   def dt(i: Int): Time = dt raw i
+
   def apply(i: Int): Time = times raw i
+
   def size: Int = times.length
+
   def isEmpty: Boolean = times.isEmpty
 
   /** Called begin() and front() in QuantLib. */
@@ -109,10 +112,10 @@ object TimeGrid {
     // (even though I'm not sure that I agree.)
     require(end > 0.0, "negative times not allowed")
     val dt = end / steps
-    val times = Vec(0 to steps: _*).mapValues(_ * dt)
+    val times = Vec(0 to steps: _*) map (_ * dt)
     val mandatoryTimes = Vec(end)
 
-    TimeGrid(times, vec.ones(steps).mapValues(_ * dt), mandatoryTimes)
+    TimeGrid(times, vec.ones(steps).map(_ * dt), mandatoryTimes)
   }
 
   /**
@@ -170,7 +173,7 @@ object TimeGrid {
         val nSteps2 = if (nSteps != 0) nSteps else 1
         val dt = (e - last) / nSteps2
 
-        val newTimes = Vec(1 to nSteps2: _*).mapValues(last + _ * dt)
+        val newTimes = Vec(1 to nSteps2: _*) map (last + _ * dt)
         acc concat newTimes
       } else acc
     })

@@ -39,23 +39,22 @@
 package org.qslib.quantscale
 
 import org.saddle.Vec
-import org.saddle.vec
 import Math._
 
 object Grid {
 
   def centered(center: Real, dx: Real, steps: Int): Vec[Real] =
-    Vec(0 to steps: _*).mapValues(i => center + (i - steps / 2.0) * dx)
+    Vec(0 to steps: _*) map (i => center + (i - steps / 2.0) * dx)
 
   def bounded(xMin: Real, xMax: Real, steps: Int): Vec[Real] = {
     val x = xMin
     val dx = (xMax - xMin) / steps
-    Vec(0 to steps: _*).mapValues(i => x + i * dx)
+    Vec(0 to steps: _*) map (i => x + i * dx)
   }
 
   def boundedLog(xMin: Real, xMax: Real, steps: Int): Vec[Real] = {
     val gridLogSpacing = (log(xMax) - log(xMin)) / steps
     val edx = exp(gridLogSpacing)
-    Vec(0 to steps: _*).mapValues(i => xMin * pow(edx, i))
+    Vec(0 to steps: _*) map (i => xMin * pow(edx, i))
   }
 }

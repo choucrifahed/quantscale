@@ -39,7 +39,7 @@ Copyright (C) 2013 Choucri FAHED
 
 package org.qslib.quantscale.time
 
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import org.qslib.quantscale.Time
 import org.joda.time.Days
 

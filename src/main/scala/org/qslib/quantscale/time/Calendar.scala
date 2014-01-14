@@ -41,7 +41,7 @@
 package org.qslib.quantscale.time
 
 import scala.math.BigInt
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import scala.annotation.tailrec
 import WeekDay._
 

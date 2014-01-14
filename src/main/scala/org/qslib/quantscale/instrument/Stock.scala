@@ -41,7 +41,7 @@ package org.qslib.quantscale.instrument
 import org.qslib.quantscale._
 import org.qslib.quantscale.Implicits._
 import org.qslib.quantscale.pattern._
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 

@@ -59,9 +59,9 @@ trait PdeSecondOrderParabolic {
     val gridI = tg.grid.slice(1, tg.grid.length)
 
     // FIXME dirty hack remove .get
-    val sigma = gridI mapValues (diffusion(t, _).get)
-    val nu = gridI mapValues (drift(t, _).get)
-    val r = gridI mapValues (discount(t, _).get)
+    val sigma = gridI map (diffusion(t, _).get)
+    val nu = gridI map (drift(t, _).get)
+    val r = gridI map (discount(t, _).get)
     val sigma2 = sigma * sigma
 
     val pd = -(sigma2 / tg.dxm - nu) / tg.dx

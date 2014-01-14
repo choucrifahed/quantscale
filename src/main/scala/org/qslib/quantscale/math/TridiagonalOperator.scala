@@ -119,7 +119,7 @@ case class TridiagonalOperator(
     val ul = vec.ones(size - 3)
     val d = vec.ones(size - 2)
 
-    withMidRows(ul.mapValues(_ * low), d.mapValues(_ * diag), ul.mapValues(_ * high))
+    withMidRows(ul.map(_ * low), d.map(_ * diag), ul.map(_ * high))
   }
 
   def withMidRows(low: Vec[Real], diag: Vec[Real], high: Vec[Real]): TridiagonalOperator = {

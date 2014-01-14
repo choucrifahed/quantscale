@@ -20,11 +20,9 @@
  When applicable, the original copyright notice follows this notice.
  */
 
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import org.qslib.quantscale._
 import Implicits._
-import Implicits.DefaultPrecision._
-import Implicits.DefaultMoneyConversionConfig._
 
 /**
  * Examples of using Money classes.
@@ -33,7 +31,7 @@ object money {
   val eur_usd = ExchangeRate(EUR, USD, 1.2042)    //> eur_usd  : org.qslib.quantscale.ExchangeRate = ExchangeRate(EUR,USD,1.2042,
                                                   //| Direct)
 
-  val m1 = 50000.0 * EUR                          //> m1  : org.qslib.quantscale.Money = 50000.0 €
+  val m1 = 50000.0 * EUR                          //> m1  : org.qslib.quantscale.Money = 50000.0 ï¿½
   val m2 = 100000.0 * USD                         //> m2  : org.qslib.quantscale.Money = 100000.0 $
 
   val conversionType = NoConversion               //> conversionType  : org.qslib.quantscale.NoConversion.type = NoConversion
@@ -47,6 +45,6 @@ object money {
   val date1 = new LocalDate(2013, 1, 1)           //> date1  : org.joda.time.LocalDate = 2013-01-01
 
   val scf = SimpleCashFlow(date1, 100 * EUR)      //> scf  : org.qslib.quantscale.SimpleCashFlow = SimpleCashFlow(date=2013-01-01
-                                                  //| , amount=100.0 €)
+                                                  //| , amount=100.0 ï¿½)
 
 }

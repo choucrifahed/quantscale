@@ -21,7 +21,7 @@
  */
 
 import org.qslib.quantscale._
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 
 // TODO move to unit test!
 object exercise {

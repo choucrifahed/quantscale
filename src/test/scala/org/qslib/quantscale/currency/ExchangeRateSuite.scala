@@ -42,7 +42,7 @@ import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.qslib.quantscale._
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import org.qslib.quantscale.Implicits._
 
 @RunWith(classOf[JUnitRunner])

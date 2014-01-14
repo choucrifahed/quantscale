@@ -41,7 +41,7 @@ package org.qslib.quantscale.termstructure.volatility.equityfx
 
 import org.qslib.quantscale._
 import org.qslib.quantscale.Implicits._
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import org.qslib.quantscale.time._
 import org.qslib.quantscale.math.interpolation._
 import org.saddle.Vec
@@ -80,8 +80,8 @@ case class BlackVarianceCurve(
   override val maxStrike = Double.MaxValue
   override val maxDate = dates.last.get
 
-  private val times = Vec(0.0) concat dates.mapValues(timeFromReference)
-  private val variances = Vec(0.0) concat (times.tail(1).zipMap(blackVolCurve)((time, vol) => time * vol * vol))
+  private val times = Vec(0.0) concat dates.map(timeFromReference)
+  private val variances = Vec(0.0) concat times.tail(1).zipMap(blackVolCurve)((time, vol) => time * vol * vol)
 
   require(!forceMonotoneVariance || variances.isAscending, "Variance must be non-decreasing")
 

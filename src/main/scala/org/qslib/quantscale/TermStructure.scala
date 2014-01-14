@@ -40,7 +40,7 @@ package org.qslib.quantscale
 
 import org.qslib.quantscale.time.DayCounter
 import org.qslib.quantscale.time.Calendar
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import org.qslib.quantscale.Implicits._
 import scala.util.Try
 import scala.util.Success

@@ -40,7 +40,6 @@ package org.qslib.quantscale.method.finitedifference
 
 import org.saddle.Vec
 import org.qslib.quantscale._
-import org.qslib.quantscale.Implicits._
 import org.qslib.quantscale.instrument.PlainVanillaPayoff
 
 /**
@@ -50,9 +49,12 @@ import org.qslib.quantscale.instrument.PlainVanillaPayoff
 trait CurveDependentStepCondition extends StepCondition {
 
   final def apply(v: Vec[Real], t: Time): Vec[Real] =
-    v map ((i, value) => applyToValue(value, wrapper(v, i)))
+    v.zipMap(Vec(0 until v.length: _*)) {
+      case (value, i) => applyToValue(value, wrapper(v, i))
+    }
 
   protected def applyToValue(value: Real, curveVal: Real): Real
+
   protected def wrapper: CurveDependentStepCondition.Wrapper
 }
 
@@ -75,6 +77,7 @@ object CurveDependentStepCondition {
     def apply(optionType: OptionType, strike: Money): PayoffWrapper =
       PayoffWrapper(PlainVanillaPayoff(optionType, strike))
   }
+
 }
 
 trait CurveDependentStepConditionFactory[T <: CurveDependentStepCondition] {

@@ -61,7 +61,7 @@ case class TransformedGrid(
 object TransformedGrid {
   def apply(grid: Vec[Real], f: Real => Real = x => x): TransformedGrid = {
     val n = grid.length
-    val transformedGrid = grid mapValues f
+    val transformedGrid = grid map f
     val transformedGridI = transformedGrid.slice(1, n - 1)
     val transformedGridIM = transformedGrid.slice(0, n - 2)
     val transformedGridIP = transformedGrid.slice(2, n)

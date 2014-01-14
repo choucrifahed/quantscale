@@ -40,7 +40,7 @@
 package org.qslib.quantscale
 
 import org.qslib.quantscale.pattern.Observable
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import org.qslib.quantscale.pattern.ObservableDefImpl
 
 /**

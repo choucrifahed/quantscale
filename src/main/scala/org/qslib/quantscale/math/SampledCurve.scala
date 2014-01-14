@@ -94,10 +94,10 @@ case class SampledCurve(grid: Vec[Real], values: Vec[Real]) {
   def scaleGrid(s: Real): SampledCurve = mapGrid(_ * s)
 
   /** This method is called transformGrid() in QuantLib. */
-  def mapGrid(f: Real => Real): SampledCurve = copy(grid = grid mapValues f)
+  def mapGrid(f: Real => Real): SampledCurve = copy(grid = grid map f)
 
   /** This method is called transform() in QuantLib. */
-  def map(f: Real => Real): SampledCurve = copy(values = values mapValues f)
+  def map(f: Real => Real): SampledCurve = copy(values = values map f)
 
   def withLogGrid(min: Real, max: Real): SampledCurve = {
     val newGrid = Grid.boundedLog(min, max, size() - 1)
@@ -111,14 +111,14 @@ case class SampledCurve(grid: Vec[Real], values: Vec[Real]) {
 
   def regrid(newGrid: Vec[Real]): SampledCurve = {
     val priceSpline = CubicNaturalSpline(grid, values)
-    SampledCurve(newGrid, newGrid.mapValues(priceSpline(_, true)))
+    SampledCurve(newGrid, newGrid.map(priceSpline(_, true)))
   }
 
   def regrid(newGrid: Vec[Real], f: Real => Real): SampledCurve = {
-    val transformedGrid = grid mapValues f
+    val transformedGrid = grid map f
     val priceSpline = CubicNaturalSpline(transformedGrid, values)
     val splineF = (x: Real) => priceSpline(x, true)
-    val newValues = newGrid.mapValues(f andThen splineF)
+    val newValues = newGrid.map(f andThen splineF)
 
     SampledCurve(newGrid, newValues)
   }
@@ -126,5 +126,5 @@ case class SampledCurve(grid: Vec[Real], values: Vec[Real]) {
 
 object SampledCurve {
   def apply(grid: Vec[Real], f: Real => Real): SampledCurve =
-    SampledCurve(grid, grid mapValues f)
+    SampledCurve(grid, grid map f)
 }

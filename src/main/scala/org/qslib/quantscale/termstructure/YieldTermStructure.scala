@@ -46,7 +46,7 @@ import org.qslib.quantscale._
 import org.qslib.quantscale.Implicits.dt
 import org.joda.time.LocalDate
 import org.qslib.quantscale.time._
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import scala.util.Try
 
 /**

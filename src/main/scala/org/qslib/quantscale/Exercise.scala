@@ -40,7 +40,7 @@
 
 package org.qslib.quantscale
 
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 
 /**
  * Option exercise classes.

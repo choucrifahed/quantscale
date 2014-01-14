@@ -39,7 +39,7 @@
 
 package org.qslib.quantscale
 
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import scala.collection.generic.ImmutableSortedMapFactory
 import scala.collection.generic.CanBuildFrom
 import scala.collection.SortedMap

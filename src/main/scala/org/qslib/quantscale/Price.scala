@@ -117,7 +117,7 @@ object IntervalPrice {
   }
 
   def extractValues(intervalPriceTimeSeries: TimeSeries[IntervalPrice], field: IntervalPriceField): Vec[Money] =
-    intervalPriceTimeSeries.values.mapValues(intervalPrice => intervalPrice(field))
+    intervalPriceTimeSeries.values.map(intervalPrice => intervalPrice(field))
 
   def extractComponent(intervalPriceTimeSeries: TimeSeries[IntervalPrice], field: IntervalPriceField): TimeSeries[Money] =
     intervalPriceTimeSeries.mapValues(intervalPrice => intervalPrice(field))
